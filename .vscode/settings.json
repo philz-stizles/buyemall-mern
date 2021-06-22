@@ -1,0 +1,9 @@
+{
+    "emmet.excludeLanguages": [
+
+        "markdown"
+    ],
+    "files.associations": {
+        "*.html": "html"
+    }
+}
