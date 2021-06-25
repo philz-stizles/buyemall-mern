@@ -1,21 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 
-const mongooseConnect = (db: string): void => {
-  mongoose.connect(db, {
+const mongooseConnect = (dbUri: string): void => {
+  mongoose.connect(dbUri, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
     useUnifiedTopology: true,
   });
 
-  const database = mongoose.connection;
+  const db = mongoose.connection as Connection;
 
-  database.once('open', async () => {
+  db.once('open', async () => {
     console.log('Connected to database');
   });
 
-  database.on('error', () => {
+  db.on('error', () => {
     console.log('Error connecting to database');
+  });
+
+  db.on('error', () => {
+    console.log('Disconnected from database');
   });
 };
 

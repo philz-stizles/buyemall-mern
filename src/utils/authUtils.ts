@@ -1,14 +1,10 @@
 // import { promisify } from 'util';
-import jwt, { Secret } from 'jsonwebtoken';
-import { UserDocument } from '@src/models/userModel';
-// import { IJWTokenPayload } from '@src/interfaces/JsonWebToken';
+import jwt from 'jsonwebtoken';
 
-export const generateToken = (user: UserDocument): string =>
-  jwt.sign(
-    { id: user._id },
-    process.env.JWT_AUTH_SECRET as Secret, // The secret should atleast 32 characters long
-    { expiresIn: process.env.JWT_AUTH_EXPIRES_IN }
-  );
+export const generateToken = (payload: string | any | Buffer): string =>
+  jwt.sign(payload, process.env.JWT_AUTH_SECRET as string, {
+    expiresIn: process.env.JWT_AUTH_EXPIRES_IN,
+  });
 
 export const verifyToken = async (token: string): Promise<any> => {
   // eslint-disable-next-line no-return-await

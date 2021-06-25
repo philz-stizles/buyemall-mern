@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { Request, Response } from 'express';
-import User, { UserDocument } from '@src/models/userModel';
-import Cart, { CartDocument } from '@src/models/cartModel';
+import User, { UserDocument } from '@src/models/user.model';
+import Cart, { CartDocument } from '@src/models/cart.model';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2020-08-27',

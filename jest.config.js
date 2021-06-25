@@ -1,6 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  verbose: true,
   coverageDirectory: 'coverage',
   collectCoverageFrom: ['src/**/*.{js,ts}'],
   coverageThreshold: {
@@ -16,4 +17,9 @@ module.exports = {
   },
   moduleDirectories: ['node_modules', 'src'],
   testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/'],
+  setupFiles: ['dotenv/config'],
+  // transform: {
+  //   'node_modules/variables/.+\\.(j|t)sx?$': 'ts-jest',
+  // },
+  // transformIgnorePatterns: ['node_modules/(?!variables/.*)'],
 };

@@ -1,0 +1,64 @@
+# Query type
+type Query {
+
+}
+
+# Mutation type
+type Mutation {
+  signup: (credentials: SignupInput) => MutationResponse,
+  login: (credentials: LoginInput) => MutationResponse
+}
+
+interface MutationResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+}
+
+
+# User - Object type
+type User {
+  _id: ID
+  name: String!  # Scalar type
+  email: String! # Scalar type
+  avatar: String! # Scalar type
+  role: Role!  # Scalar type
+  isActive: Boolean! # Scalar type
+}
+
+#Cart - Object types
+# This "Cart" Object type defines the queryable fields for every cart in our data source
+type Cart {
+  _id: ID
+  products: [CartProduct]!
+  cartTotal: Float!
+  totalAfterDiscount: Float
+  orderedBy: User!
+}
+
+type CartProduct {
+  _id: ID
+  product: ID;
+  count: Int;
+  color: String;
+  price: Float;
+}
+
+# SignupInput - Input type
+input SignupInput {
+  email: String! # Scalar type
+  name: String! # Scalar type
+  password: String! # Scalar type
+}
+
+# LoginInput - Input type
+input LoginInput {
+  email: String! # Scalar type
+  password: String! # Scalar type
+}
+
+enum Roles {
+  CUSTOMER
+  BUSINESS
+  ADMIN
+}

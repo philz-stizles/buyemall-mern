@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
-import User from '../models/userModel';
+import User from '../models/user.model';
 import { filterRequestBody, createAndSendTokenWithCookie } from '../utils/apiUtils';
 import AppError from '../utils/appError';
 import { generateToken } from '../utils/authUtils';
 import catchAsync from '../utils/catchAsync';
 import * as factory from './handlerFactory';
 import { IAuthRequest } from '@src/interfaces/AuthRequest';
-import Order, { OrderDocument } from '../models/orderModel';
+import Order, { OrderDocument } from '../models/order.model';
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
   const { name, email, password, confirmPassword } = req.body;

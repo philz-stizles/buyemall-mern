@@ -1,0 +1,111 @@
+import request from 'supertest';
+// import mongoose from 'mongoose';
+import app from '@src/app';
+import User from '@src/models/userModel';
+
+beforeEach(async () => {
+  // Clear the User DB to have a clean slate
+  await User.deleteMany();
+});
+
+// beforeEach(done => {
+//   mongoose.connect(
+//     process.env.MONGODB_LOCAL_TEST_URI as string,
+//     { useNewUrlParser: true, useUnifiedTopology: true },
+//     () => done()
+//   );
+// });
+
+// afterEach(done => {
+//   mongoose.connection.db.dropDatabase(() => {
+//     mongoose.connection.close(() => done());
+//   });
+// });
+
+describe('Auth API endpoints', () => {
+  describe('Signup user @ POST /api/auth', () => {
+    describe('Valid username and password', () => {
+      // it('should respond with a 201 status code', async () => {
+      //   const response = await request(app)
+      //     .post('/api/v1/auth/signup')
+      //     .send(mockSignupUser)
+      //     // .expect('Content-Type', /json/)
+      //     .expect(201);
+      //   const { data } = response.body;
+      //   expect(response.body).toMatchObject({
+      //     status: true,
+      //     data: {
+      //       user: {},
+      //       token: data.token,
+      //     },
+      //   });
+      // });
+      const mockSignupUser = {
+        name: 'theophilus',
+        email: 'theophilus@gmail.com',
+        password: 'ighalo',
+        confirmPassword: 'ighalo',
+      };
+      it('should respond with a 201 status code', async () => {
+        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+        expect(res.statusCode).toBe(201); // Don't use toBe() with floating point numbers.
+      });
+
+      it('should specify json in the content-type header', async () => {
+        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+        expect(res.headers['content-type']).toEqual(expect.stringContaining('json'));
+      });
+    });
+
+    // describe('Invalid username and password', () => {
+    //   it('should specify json in the content-type header', async () => {
+    //     const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+    //     expect(res.headers['content-type']).toEqual(expect.stringContaining('json'));
+    //   });
+    // });
+  });
+});
+
+// describe('Auth API endpoints', () => {
+//   const mockSignupUser = {
+//     name: 'theophilus',
+//     email: 'theophilus@gmail.com',
+//     password: 'ighalo',
+//     confirmPassword: 'ighalo',
+//   };
+
+//   describe('Signup user @ POST /api/auth', () => {
+//     describe('Valid username and password', () => {
+//       it('should respond with a 201 status code', async () => {
+//         const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+//         expect(res.statusCode).toBe(201); // Don't use toBe() with floating point numbers.
+//       });
+
+//       it('should specify json in the content-type header', async () => {
+//         const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+//         expect(res.statusCode).toBe(400);
+//       });
+//     });
+
+//     describe('Invalid username and password', () => {
+//       it('should specify json in the content-type header', async () => {
+//         const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+//         expect(res.headers['content-type']).toEqual(expect.stringContaining('json'));
+//       });
+//     });
+//   });
+// });
+it('should respond with a 201 status code', () => {
+        return request(app)
+          .post('/api/v1/auth/signup')
+          .send(mockSignupUser)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .then(response => {
+            expect(response.body).toEqual(
+              expect.objectContaining({
+                status: expect.any(Boolean),
+              })
+            );
+          });
+      });
