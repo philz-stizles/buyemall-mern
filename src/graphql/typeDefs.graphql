@@ -1,12 +1,18 @@
 # Query type
 type Query {
+  categories: QueryResponse
+}
 
+interface QueryResponse {
+  code: String!
+  success: Boolean!
+  message: String!
 }
 
 # Mutation type
 type Mutation {
-  signup: (credentials: SignupInput) => MutationResponse,
-  login: (credentials: LoginInput) => MutationResponse
+  signup(credentials: SignupInput): MutationResponse,
+  login(credentials: LoginInput): MutationResponse
 }
 
 interface MutationResponse {
@@ -38,10 +44,10 @@ type Cart {
 
 type CartProduct {
   _id: ID
-  product: ID;
-  count: Int;
-  color: String;
-  price: Float;
+  product: ID
+  count: Int
+  color: String
+  price: Float
 }
 
 # SignupInput - Input type
@@ -57,7 +63,7 @@ input LoginInput {
   password: String! # Scalar type
 }
 
-enum Roles {
+enum Role {
   CUSTOMER
   BUSINESS
   ADMIN

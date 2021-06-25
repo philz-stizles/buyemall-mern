@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserDocument } from '@src/models/user.model';
+import { IUserDocument } from '@src/models/user.model';
 import { generateToken } from './authUtils';
 
 class APIFeatures {
@@ -73,7 +73,7 @@ const filterRequestBody = (body: any, ...allowedFields: string[]): any => {
   return newBody;
 };
 
-const createAndSendToken = (user: UserDocument, statusCode: number, res: Response): void => {
+const createAndSendToken = (user: IUserDocument, statusCode: number, res: Response): void => {
   const token = generateToken({ id: user._id });
 
   res.status(statusCode).json({
@@ -87,7 +87,7 @@ const createAndSendToken = (user: UserDocument, statusCode: number, res: Respons
 };
 
 const createAndSendTokenWithCookie = (
-  user: UserDocument,
+  user: IUserDocument,
   statusCode: number,
   req: Request,
   res: Response,

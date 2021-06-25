@@ -12,26 +12,26 @@ import {
   uploadFile,
   removeFile,
 } from '@src/controllers/product.controllers';
-import { authCheck, adminCheck } from '@src/middlewares/auth.middlewares';
+import { authenticate, authorize } from '@src/middlewares/auth.middlewares';
 
 const router = express.Router();
 
-router.route('/products').post(authCheck, adminCheck, create).get(listAll);
+router.route('/products').post(authenticate, authorize('admin'), create).get(listAll);
 
 router.post('/products/filtered', list);
 
 router.get('/products/total').get(getProductsTotal);
 
-router.post('/products/upload', authCheck, adminCheck, uploadFile);
-router.post('/products/remove-file', authCheck, adminCheck, removeFile);
+router.post('/products/upload', authenticate, authorize('admin'), uploadFile);
+router.post('/products/remove-file', authenticate, authorize('admin'), removeFile);
 
 router
   .route('/products/:slug')
   .get(read)
-  .put(authCheck, adminCheck, update)
-  .delete(authCheck, adminCheck, remove);
+  .put(authenticate, authorize('admin'), update)
+  .delete(authenticate, authorize('admin'), remove);
 
-router.put('/products/:productId/set-rating', authCheck, setProductRating);
+router.put('/products/:productId/set-rating', authenticate, setProductRating);
 
 router.get('/products/:productId/related', listRelatedProducts);
 

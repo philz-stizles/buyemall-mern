@@ -154,7 +154,9 @@ app.use('/api/v1/log', logRoutes);
 // set playground: true and introspection: true
 // https://studio.apollographql.com/sandbox/explorer
 export const apolloServer = new ApolloServer({
-  typeDefs: gql(fs.readFileSync('@src/graphql/typeDefs.graphql', { encoding: 'utf8' })),
+  typeDefs: gql(
+    fs.readFileSync(path.join(__dirname, 'graphql', 'typeDefs.graphql'), { encoding: 'utf8' })
+  ),
   resolvers,
   context,
   formatError, // Error formatting

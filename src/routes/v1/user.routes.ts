@@ -16,7 +16,7 @@ import {
   deleteUser,
   getUser,
   createUser,
-} from '@src/controllers/userControllers';
+} from '@src/controllers/user.controllers';
 import { authenticate, authorize } from '@src/middlewares/auth.middlewares';
 import { changePassword } from '@src/controllers/auth.controllers';
 import { resizeUserPhoto, uploadUserPhoto } from '@src/middlewares/multerMiddlewares';

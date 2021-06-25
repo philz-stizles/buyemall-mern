@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { Request, Response } from 'express';
-import User, { UserDocument } from '@src/models/user.model';
-import Cart, { CartDocument } from '@src/models/cart.model';
+import User, { IUserDocument } from '@src/models/user.model';
+import Cart, { ICartDocument } from '@src/models/cart.model';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2020-08-27',
@@ -12,10 +12,10 @@ exports.createPaymentIntent = async (req: Request, res: Response) => {
 
   // Get user to retrieve user._id from DB, firebase auth middleware may not have
   // the users db _id
-  const user: UserDocument | null = await User.findOne({ email: req.user.email }).exec();
+  const user: IUserDocument | null = await User.findOne({ email: req.user.email }).exec();
 
   // 2 get user cart total
-  const cart: CartDocument | null = await Cart.findOne({
+  const cart: ICartDocument | null = await Cart.findOne({
     orderedBy: user?._id,
   }).exec();
 

@@ -1,9 +1,11 @@
-const Category = require('../models/category');
-const Product = require('../models/productModel');
-const Sub = require('../models/subCategory');
-const slugify = require('slugify');
+import { FilterQuery } from 'mongoose';
+import { Request, Response } from 'express';
+import slugify from 'slugify';
+import Category, { ICategoryDocument } from '@src/models/category.model';
+import Product from '@src/models/product.model';
+import Sub from '@src/models/subCategory.model';
 
-exports.create = async (req, res) => {
+export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name } = req.body;
     const category = await new Category({ name, slug: slugify(name) }).save();
@@ -14,19 +16,26 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.list = async (req, res) => {
+export const list = async (req: Request, res: Response): Promise<void> => {
   const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
   res.json(categories);
 };
 
-exports.read = async (req, res) => {
+export const read = async (req: Request, res: Response): Promise<Response> => {
   const category = await Category.findOne({ slug: req.params.slug }).exec();
-  const products = await Product.find({ category }).populate('category').exec();
+  if (!category) {
+    return res.status(404).json({ status: false });
+  }
 
-  res.json({ category, products });
+  const products = await Product.find({ category } as FilterQuery<ICategoryDocument>)
+    .populate('category')
+    .exec();
+  // const products = await Product.find({ category }).populate('category').exec();
+
+  return res.json({ category, products });
 };
 
-exports.update = async (req, res) => {
+export const update = async (req: Request, res: Response): Promise<void> => {
   const { name } = req.body;
   try {
     const updatedCategory = await Category.findOneAndUpdate(
@@ -40,7 +49,7 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.remove = async (req, res) => {
+export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedCategory = await Category.findOneAndDelete({ slug: req.params.slug });
     res.json(deletedCategory);
@@ -49,9 +58,12 @@ exports.remove = async (req, res) => {
   }
 };
 
-exports.getCategorySubs = (req, res) => {
-  Sub.find({ parent: req.params._id }).exec((err, subs) => {
-    if (err) console.log(err);
-    res.json(subs);
+export const getCategorySubs = (req: Request, res: Response): void => {
+  return Sub.find({ parent: req.params._id }).exec((err, subs) => {
+    if (err) {
+      console.log(err);
+      return res.status(400);
+    }
+    return res.json(subs);
   });
 };

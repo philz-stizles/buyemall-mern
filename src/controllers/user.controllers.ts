@@ -81,7 +81,7 @@ export const deleteMe = catchAsync(async (req: IAuthRequest, res: Response) => {
 });
 
 export const changePassword = catchAsync(
-  async (req: IAuthRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     // Check if user exists - Find the user by id
     const existingUser = await User.findById(req.user.id).select('+password');
     if (!existingUser) return next(new AppError('user invalid', 400));
@@ -114,7 +114,7 @@ export const getUser = factory.getOne(User);
 export const updateUser = factory.updateOne(User);
 export const deleteUser = factory.deleteOne(User);
 
-export const getCurrentUser = async (req: IAuthRequest, res: Response): Promise<void> => {
+export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
   User.findOne({ email: req.user.email }).exec((error, existingUser) => {
     console.log(error, existingUser);
     if (error || !existingUser) throw new Error(error?.message);
@@ -123,13 +123,13 @@ export const getCurrentUser = async (req: IAuthRequest, res: Response): Promise<
   });
 };
 
-export const saveUserAddress = async (req: IAuthRequest, res: Response): Promise<void> => {
+export const saveUserAddress = async (req: Request, res: Response): Promise<void> => {
   await User.findOneAndUpdate({ email: req.user.email }, { address: req.body.address }).exec();
 
   res.json({ ok: true });
 };
 
-export const addToWishlist = async (req: IAuthRequest, res: Response): Promise<void> => {
+export const addToWishlist = async (req: Request, res: Response): Promise<void> => {
   const { productId } = req.body;
 
   await User.findOneAndUpdate(
@@ -140,7 +140,7 @@ export const addToWishlist = async (req: IAuthRequest, res: Response): Promise<v
   res.json({ ok: true });
 };
 
-export const wishlist = async (req: IAuthRequest, res: Response): Promise<void> => {
+export const wishlist = async (req: Request, res: Response): Promise<void> => {
   const userWishList = await User.findOne({ email: req.user.email })
     .select('wishlist')
     .populate('wishlist')
@@ -149,7 +149,7 @@ export const wishlist = async (req: IAuthRequest, res: Response): Promise<void> 
   res.json(userWishList);
 };
 
-export const removeFromWishlist = async (req: IAuthRequest, res: Response): Promise<any> => {
+export const removeFromWishlist = async (req: Request, res: Response): Promise<any> => {
   const { productId } = req.params;
   await User.findOneAndUpdate({ email: req.user.email }, { $pull: { wishlist: productId } }).exec();
 

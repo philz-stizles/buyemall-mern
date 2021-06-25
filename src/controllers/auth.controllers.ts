@@ -33,7 +33,7 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
   const { email, password } = req.body as LoginBody;
 
   // Check if user exists
-  const existingUser: IUserDocument | null = await User.findOne({ email }).select('+password'); // There is difference between adding
+  const existingUser = await User.findOne({ email }).select('+password'); // There is difference between adding
   // +password and just password. +password will add to already visible fields if not already visible
   // password without the + would select just that field as visible and will continue to include any new fields that
   // you specify to the list of included fields. The _id is always returned accept you specify otherwise
@@ -92,7 +92,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response, next: NextF
   const currentHashedToken = crypto.createHash('sha256').update(params.token).digest('hex');
 
   // Find a user with this hashed token
-  const existingUser: IUserDocument | null = await User.findOne({
+  const existingUser = await User.findOne({
     passwordResetToken: currentHashedToken,
     passwordResetExpiresIn: { $gt: Date.now() },
   });

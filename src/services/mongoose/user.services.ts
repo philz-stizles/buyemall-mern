@@ -1,10 +1,10 @@
 import { DocumentDefinition, FilterQuery, LeanDocument } from 'mongoose';
 import { omit } from 'lodash';
-import User, { UserDocument } from '@src/models/user.model';
+import User, { IUserDocument } from '@src/models/user.model';
 
 export const createUser = async (
-  modelObject: DocumentDefinition<UserDocument>
-): Promise<UserDocument> => {
+  modelObject: DocumentDefinition<IUserDocument>
+): Promise<IUserDocument> => {
   try {
     return await User.create(modelObject);
   } catch (error) {
@@ -13,8 +13,8 @@ export const createUser = async (
 };
 
 export const findUser = async (
-  query: FilterQuery<UserDocument>
-): Promise<LeanDocument<UserDocument> | null> => {
+  query: FilterQuery<IUserDocument>
+): Promise<LeanDocument<IUserDocument> | null> => {
   // If you're executing a query and sending the results without modification to, say, an Express response,
   // you should use lean.In general, if you do not modify the query results and do not use custom getters,
   // you should use lean(). If you modify the query results or rely on features like getters or transforms,
@@ -26,9 +26,9 @@ export const validatePassword = async ({
   email,
   password,
 }: {
-  email: UserDocument['email'];
+  email: IUserDocument['email'];
   password: string;
-}): Promise<false | Pick<LeanDocument<UserDocument>, 'name'>> => {
+}): Promise<false | Pick<LeanDocument<IUserDocument>, 'name'>> => {
   const user = await User.findOne({ email });
 
   if (!user) {
