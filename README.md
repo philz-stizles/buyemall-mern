@@ -7,9 +7,10 @@ This is an e-commerce back end resource that enables users to signup and purchas
 ## Technologies
 
 - Node, Express,
-- Typescript, Eslint
-- Jest, Istanbul
-- AWS SES, S3, EC2
+- REST, GraphQL, Sockets
+- Typescript, Eslint, Prettier
+- Jest, Istanbul, Supertest
+- AWS SES, S3, EC2, Serverless
 - Cloudinary
 - MongoDB, Redis
 - Docker
@@ -19,6 +20,7 @@ This is an e-commerce back end resource that enables users to signup and purchas
 - Multitenancy
 - Authentication, Authorization
 - Crone jobs, and schedulers
+- GraphQL DataSources
 - Testing and coveralls
 
 ## Configure Typescript
@@ -91,6 +93,46 @@ This is an e-commerce back end resource that enables users to signup and purchas
   npm i --save-dev @types/dotenv-safe
 - Create files '.env.example' and '.env'
 
+## File Uploads
+
+    - multer - for parsing, validation etc
+    - formidable
+    - sharp: 
+      - description: for resizing
+      - installation: 
+        npm install sharp | yarn add sharp
+        [typescript] npm install @types/sharp | yarn add @types/sharp 
+
+## Security issues and best practices
+
+  Compromised Database
+
+    - Strongly encrypt passwords with salt and hash (bcrypt)
+    - Strongly encrypt password reset tokens (SHA 256)
+
+  Brute Force Attacks
+
+    - Use bcrypt to make login requests slow
+    - Implement rate limiting(npm install express-rate-limit) which limits the no of requests from on single IP
+    - Implement max login attempts
+
+  Cross-site Scripting Attacks
+
+    - Store JWT in HTTPOnly cookies
+    - Sanitize user input data
+    - Set special HTTP headers(helmet)
+
+  Cross-site Scripting Attacks - This attack allows the attacker to read the localStorage which is the reason we should never store token in localstorage
+
+    - Store JWT in HTTPOnly cookies
+    - Sanitize user input data
+    - Set special HTTP headers(helmet)
+
+  Sanitization
+
+    - xss-clean
+    - express-mongo-sanitize
+
 npm i --save-dev @types/morgan @types/hpp
 
 - -JWT_EXPIRES_IN=90d # 30s | 5m | 5h | 1d
@@ -118,37 +160,7 @@ nodemailer
 // Put as much business logic in the models to keep the controllers as simple and lean as possible, so that controllers can focus on handling requests and interacting with models and send responses
 
 // Configure Eslint & Prettier: npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-config-airbnb eslint-plugin-node eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-markdown
-//
-//
-//
-// SECURITY ISSUES AND BEST PRACTISES
-// Compromised Database
-// - Strongly encrypt passwords with salt and hash (bcrypt)
-// - Strongly encrypt password reset tokens (SHA 256)
-//
-// Brute Force Attacks
-// - Use bcrypt to make login requests slow
-// - Implement rate limiting(npm install express-rate-limit) which limits the no of requests from on single IP
-// - Implement max login attampts
-//
-// Cross-site Scripting Attacks
-// - Store JWT in HTTPOnly cookies
-// - SAanitize user input data
-// - Set special HTTP headers(helmet)
-//
-// Cross-site Scripting Attacks - This attack allows the attacker to read the localStorage which is the reason we should never store token in localstorage
-// - Store JWT in HTTPOnly cookies
-// - SAanitize user input data
-// - Set special HTTP headers(helmet)
-//
-// Sanitization
-// - xss-clean
-// - express-mongo-sanitize
 
-// FILE UPLOADS
-
-- multer - for parsing, validation etc
-- sharp - for resizing
 
 DATA MODELLING
 This is the process of converting unstructured data from real-world scenarios into structured, logical data models

@@ -7,11 +7,18 @@ export interface ICartProduct {
   price: number;
 }
 
-export interface ICartDocument extends Document {
+export interface CartDocument {
   products: ICartProduct[];
   cartTotal: number;
   totalAfterDiscount: number;
   orderedBy: Types.ObjectId;
+}
+
+export interface ICartDocument extends Document, CartDocument {
+  // products: ICartProduct[];
+  // cartTotal: number;
+  // totalAfterDiscount: number;
+  // orderedBy: Types.ObjectId;
 }
 
 const cartSchema = new Schema(

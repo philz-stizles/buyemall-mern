@@ -44,28 +44,41 @@ app.enable('trust proxy');
 mongooseConnect(config().dbUri);
 
 /** Rules of our API */
-app.use((req, res, next): unknown => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-  );
+// Cors
+app.use((req: Request, res: Response, next): Response | void => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+  // A fix for graphql response with status of 405 (Method Not Allowed)
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-    // return res.status(200).json({});
     return res.sendStatus(200);
   }
-
   return next();
 });
+// app.use((req, res, next): unknown => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+//   );
+//   res.header('Access-Control-Allow-Credentials', true);
+
+//   if (req.method === 'OPTIONS') {
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+//     // return res.status(200).json({});
+//     return res.sendStatus(200);
+//   }
+
+//   return next();
+// });
 
 // CORS
 app.use(
-  cors({
-    // origin: 'https://someurl.com'
-  })
-); // cors() is a middleware which means that you can implement on specific routes as middlware
+  cors()
+  // origin: 'https://someurl.com'
+); // cors() is a middleware which means that you can implement on specific routes as middleware
 
 // app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors()) // You can also use for specific routes
@@ -161,6 +174,8 @@ export const apolloServer = new ApolloServer({
   context,
   formatError, // Error formatting
   dataSources, // DataSource - MongoDB
+  introspection: true,
+  playground: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
 });
 apolloServer.applyMiddleware({ app, path: '/graphql' });
 

@@ -1,10 +1,10 @@
-import { ExpressContext, AuthenticationError } from 'apollo-server-express';
+import { ExpressContext } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
 import User, { IUserDocument } from '@src/models/user.model';
 import { IJWTokenPayload } from '@src/interfaces/JsonWebToken';
 
 export interface IContext {
-  user: IUserDocument;
+  user: IUserDocument | null;
   isAuthenticated: boolean;
 }
 
@@ -20,7 +20,8 @@ const context = async ({ req }: ExpressContext): Promise<IContext> => {
   // const token = req.headers.authorization || '';
   const authHeader = req.get('Authorization');
   if (!authHeader) {
-    throw new AuthenticationError('you must be logged in');
+    // throw new AuthenticationError('you must be logged in');
+    return { isAuthenticated: false, user: null };
   }
 
   // get the user token from the headers
@@ -31,17 +32,20 @@ const context = async ({ req }: ExpressContext): Promise<IContext> => {
   try {
     decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as IJWTokenPayload;
   } catch (error) {
-    throw new AuthenticationError(error.message);
+    // throw new AuthenticationError(error.message);
+    return { isAuthenticated: false, user: null };
   }
 
   if (!decodedToken) {
-    throw new AuthenticationError('you must be logged in');
+    // throw new AuthenticationError('you must be logged in');
+    return { isAuthenticated: false, user: null };
   }
 
   // try to retrieve a user with the token
   const user = await User.findById(decodedToken.userId);
   if (!user) {
-    throw new AuthenticationError('Please register to complete this process');
+    // throw new AuthenticationError('Please register to complete this process');
+    return { isAuthenticated: false, user: null };
   }
 
   // we could also check user roles/permissions here
