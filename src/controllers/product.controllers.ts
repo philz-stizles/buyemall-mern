@@ -21,7 +21,10 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const uploadFile = async (req: Request, res: Response): Promise<void> => {
+export const uploadFile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   console.log(req.body.image);
   const result = await cloudinaryService.uploadFile(req.body.image);
 
@@ -31,13 +34,19 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
   });
 };
 
-export const removeFile = async (req: Request, res: Response): Promise<void> => {
-  await cloudinaryService.removeFile(req.body.public_id, (err, result): Response => {
-    console.log('error', err);
-    console.log('result', result);
-    if (err) return res.json({ success: false, err });
-    return res.send('ok');
-  });
+export const removeFile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  await cloudinaryService.removeFile(
+    req.body.public_id,
+    (err, result): Response => {
+      console.log('error', err);
+      console.log('result', result);
+      if (err) return res.json({ success: false, err });
+      return res.send('ok');
+    }
+  );
 };
 
 type ProductQuery = {
@@ -55,7 +64,10 @@ export const listAll = async (req: Request, res: Response): Promise<void> => {
   res.json(products);
 };
 
-export const remove = async (req: Request, res: Response): Promise<Response> => {
+export const remove = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const deleted = await Product.findOneAndRemove({
       slug: req.params.slug,
@@ -80,9 +92,13 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (req.body.title) {
       req.body.slug = slugify(req.body.title);
     }
-    const updated = await Product.findOneAndUpdate({ slug: req.params.slug }, req.body, {
-      new: true,
-    }).exec();
+    const updated = await Product.findOneAndUpdate(
+      { slug: req.params.slug },
+      req.body,
+      {
+        new: true,
+      }
+    ).exec();
     res.json(updated);
   } catch (err) {
     console.log('PRODUCT UPDATE ERROR ----> ', err);
@@ -134,12 +150,18 @@ export const list = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getProductsTotal = async (_req: Request, res: Response): Promise<void> => {
+export const getProductsTotal = async (
+  _req: Request,
+  res: Response
+): Promise<Response> => {
   const total = await Product.find({}).estimatedDocumentCount().exec();
-  res.json(total);
+  return res.json(total);
 };
 
-export const setProductRating = async (req: Request, res: Response): Promise<Response> => {
+export const setProductRating = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const existingProduct = await Product.findById(req.params.productId).exec();
   if (!existingProduct) {
     return res.status(404);
@@ -182,7 +204,10 @@ export const setProductRating = async (req: Request, res: Response): Promise<Res
   return res.json(ratingUpdated);
 };
 
-export const listRelatedProducts = async (req: Request, res: Response): Promise<Response> => {
+export const listRelatedProducts = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const targetProduct = await Product.findById(req.params.productId).exec();
   if (!targetProduct) {
     return res.status(404);
@@ -234,7 +259,11 @@ const handlePrice = async (_req: Request, res: Response, price: number[]) => {
   }
 };
 
-const handleCategory = async (req: Request, res: Response, category: string) => {
+const handleCategory = async (
+  req: Request,
+  res: Response,
+  category: string
+) => {
   try {
     const products = await Product.find({ category })
       .populate('category', '_id name')
@@ -285,7 +314,11 @@ const handleSub = async (req: Request, res: Response, sub: string) => {
   res.json(products);
 };
 
-const handleShipping = async (req: Request, res: Response, shipping: string) => {
+const handleShipping = async (
+  req: Request,
+  res: Response,
+  shipping: string
+) => {
   const products = await Product.find({ shipping })
     .populate('category', '_id name')
     .populate('subs', '_id name')
@@ -315,8 +348,12 @@ const handleBrand = async (req: Request, res: Response, brand: string) => {
   res.json(products);
 };
 
-export const searchFilters = async (req: Request, res: Response): Promise<void> => {
-  const { query, price, category, stars, sub, shipping, color, brand } = req.body;
+export const searchFilters = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { query, price, category, stars, sub, shipping, color, brand } =
+    req.body;
 
   if (query) {
     console.log('query --->', query);

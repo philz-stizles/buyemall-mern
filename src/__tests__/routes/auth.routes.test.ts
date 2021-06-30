@@ -1,6 +1,6 @@
 import request from 'supertest';
-import app from '@src/app';
-import User from '@src/models/user.model';
+import app from '../../app';
+import User from '../../models/user.model';
 
 beforeAll(() => {
   process.env.NODE_ENV = 'test';
@@ -22,17 +22,25 @@ describe('Auth API endpoints', () => {
       };
 
       it('should respond with a 201 status code', async () => {
-        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+        const res = await request(app)
+          .post('/api/v1/auth/signup')
+          .send(mockSignupUser);
         expect(res.statusCode).toBe(201); // Don't use toBe() with floating point numbers.
       });
 
       it('should return a response header with a Content-Type of json', async () => {
-        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
-        expect(res.headers['content-type']).toEqual(expect.stringContaining('json'));
+        const res = await request(app)
+          .post('/api/v1/auth/signup')
+          .send(mockSignupUser);
+        expect(res.headers['content-type']).toEqual(
+          expect.stringContaining('json')
+        );
       });
 
       it('should return a response body with a boolean status', async () => {
-        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+        const res = await request(app)
+          .post('/api/v1/auth/signup')
+          .send(mockSignupUser);
         expect(res.body).toEqual(
           expect.objectContaining({
             status: true,
@@ -41,7 +49,9 @@ describe('Auth API endpoints', () => {
       });
 
       it('should return a response body with a data object containing a token', async () => {
-        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+        const res = await request(app)
+          .post('/api/v1/auth/signup')
+          .send(mockSignupUser);
         expect(res.body).toEqual(
           expect.objectContaining({
             data: expect.objectContaining({
@@ -56,7 +66,9 @@ describe('Auth API endpoints', () => {
       const mockSignupUser = {};
 
       it('should respond with a 400 status code', async () => {
-        const res = await request(app).post('/api/v1/auth/signup').send(mockSignupUser);
+        const res = await request(app)
+          .post('/api/v1/auth/signup')
+          .send(mockSignupUser);
         expect(res.statusCode).toBe(400); // Don't use toBe() with floating point numbers.
       });
     });

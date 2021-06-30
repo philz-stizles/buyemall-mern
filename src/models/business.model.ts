@@ -18,7 +18,12 @@ export type BusinessDocument = Document & {
 // 2. Create a Schema corresponding to the document interface.
 const businessSchema = new Schema<BusinessDocument>(
   {
-    name: { type: String, required: [true, 'A user must have a name'], trim: true, unique: true },
+    name: {
+      type: String,
+      required: [true, 'A user must have a name'],
+      trim: true,
+      unique: true,
+    },
     logo: {
       url: String,
       uploadId: String,

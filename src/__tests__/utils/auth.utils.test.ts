@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
-import { generateToken } from '@src/utils/authUtils';
+import { generateToken } from '../../utils/authUtils';
 
 describe('Authentication utilities', () => {
   describe('generateToken', () => {

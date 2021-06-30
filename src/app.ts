@@ -1,5 +1,4 @@
 import path from 'path';
-import fs from 'fs';
 import express, { Express, Request, Response } from 'express';
 import expressRateLimit from 'express-rate-limit';
 import helmet from 'helmet';
@@ -10,9 +9,8 @@ import hpp from 'hpp';
 import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import { ApolloServer, gql } from 'apollo-server-express';
-import mongooseConnect from './db/index';
-import AppError from './utils/appError';
+import swaggerUI from 'swagger-ui-express';
+import mongooseConnect from './db/mongo/index';
 // import errorControllers from './controllers/errorController';
 // import { webhookCheckout } from './controllers/bookingControllers';
 import config from './config';
@@ -28,17 +26,16 @@ import orderRoutes from '@src/routes/v1/order.routes';
 import couponRoutes from '@src/routes/v1/coupon.routes';
 import auditRoutes from '@src/routes/v1/audit.routes';
 import logRoutes from '@src/routes/v1/log.routes';
-// GraphQL dependencies
-import resolvers from '@src/graphql/resolvers';
-import formatError from '@src/graphql/error';
-import context from '@src/graphql/context';
-import dataSources from '@src/graphql/dataSources/mongodb';
+import specs from './documentation/swagger.jsdoc';
+// import swaggerDocument from './documentation';
 
 // Initialize Server
 const app: Express = express();
 
 //
 app.enable('trust proxy');
+
+console.log(config().dbUri);
 
 // Database
 mongooseConnect(config().dbUri);
@@ -47,7 +44,10 @@ mongooseConnect(config().dbUri);
 // Cors
 app.use((req: Request, res: Response, next): Response | void => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  );
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
@@ -148,6 +148,9 @@ app.use((req: Request, res: Response, next) => {
   next();
 });
 
+// DOCUMENTATION
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+
 // RESOURCES ROUTES
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
@@ -160,34 +163,5 @@ app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/log', logRoutes);
-
-// Configure GraphQL Apollo Server
-// If your server is deployed to an environment where NODE_ENV is set to production,
-// GraphQL Playground and introspection are disabled by default. To enable them,
-// set playground: true and introspection: true
-// https://studio.apollographql.com/sandbox/explorer
-export const apolloServer = new ApolloServer({
-  typeDefs: gql(
-    fs.readFileSync(path.join(__dirname, 'graphql', 'typeDefs.graphql'), { encoding: 'utf8' })
-  ),
-  resolvers,
-  context,
-  formatError, // Error formatting
-  dataSources, // DataSource - MongoDB
-  introspection: true,
-  playground: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
-});
-apolloServer.applyMiddleware({ app, path: '/graphql' });
-
-// Handle unhandled routes - routes that are not caught by our routers
-// Pass Error to the global error handler middleware
-app.all('*', (req, res, next) => {
-  const error = new AppError(`Can't find ${req.originalUrl} on this server`, 404);
-
-  next(error);
-});
-
-// Global error handling
-// app.use(errorControllers.handleGlobalErrors);
 
 export default app;

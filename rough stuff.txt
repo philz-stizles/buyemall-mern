@@ -1,3 +1,14 @@
+{% comment %} {
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "bracketSpacing": true,
+  "jsxBracketSameLine": false,
+  "fluid": false
+}
+
 import request from 'supertest';
 // import mongoose from 'mongoose';
 import app from '@src/app';
@@ -174,4 +185,4 @@ it('should respond with a 201 status code', () => {
 #   CUSTOMER
 #   BUSINESS
 #   ADMIN
-# }
+# } {% endcomment %}

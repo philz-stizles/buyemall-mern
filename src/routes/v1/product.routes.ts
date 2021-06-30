@@ -20,7 +20,7 @@ router.route('/products').post(authenticate, authorize('admin'), create).get(lis
 
 router.post('/products/filtered', list);
 
-router.get('/products/total').get(getProductsTotal);
+router.get('/products/total', getProductsTotal);
 
 router.post('/products/upload', authenticate, authorize('admin'), uploadFile);
 router.post('/products/remove-file', authenticate, authorize('admin'), removeFile);

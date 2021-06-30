@@ -97,38 +97,44 @@ This is an e-commerce back end resource that enables users to signup and purchas
 
     - multer - for parsing, validation etc
     - formidable
-    - sharp: 
+    - sharp:
       - description: for resizing
-      - installation: 
+      - installation:
         npm install sharp | yarn add sharp
-        [typescript] npm install @types/sharp | yarn add @types/sharp 
+        [typescript] npm install @types/sharp | yarn add @types/sharp
+    - cloudinary:
+    - aws sdk
+
+## AWS
+
+aws-sdk: npm install aws-sdk
 
 ## Security issues and best practices
 
-  Compromised Database
+Compromised Database
 
     - Strongly encrypt passwords with salt and hash (bcrypt)
     - Strongly encrypt password reset tokens (SHA 256)
 
-  Brute Force Attacks
+Brute Force Attacks
 
     - Use bcrypt to make login requests slow
     - Implement rate limiting(npm install express-rate-limit) which limits the no of requests from on single IP
     - Implement max login attempts
 
-  Cross-site Scripting Attacks
+Cross-site Scripting Attacks
 
     - Store JWT in HTTPOnly cookies
     - Sanitize user input data
     - Set special HTTP headers(helmet)
 
-  Cross-site Scripting Attacks - This attack allows the attacker to read the localStorage which is the reason we should never store token in localstorage
+Cross-site Scripting Attacks - This attack allows the attacker to read the localStorage which is the reason we should never store token in localstorage
 
     - Store JWT in HTTPOnly cookies
     - Sanitize user input data
     - Set special HTTP headers(helmet)
 
-  Sanitization
+Sanitization
 
     - xss-clean
     - express-mongo-sanitize
@@ -161,7 +167,6 @@ nodemailer
 
 // Configure Eslint & Prettier: npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-config-airbnb eslint-plugin-node eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-markdown
 
-
 DATA MODELLING
 This is the process of converting unstructured data from real-world scenarios into structured, logical data models
 
@@ -184,3 +189,7 @@ npm run test
 
 // CHALLENGES => TODO
 // Users can only review a tour that they have actually booked
+
+mongoose@5.11.16
+node@14.15.5
+typescript@4.1.5

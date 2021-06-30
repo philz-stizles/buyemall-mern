@@ -1,7 +1,7 @@
-const path = require('path')
-const multer = require('multer')
-const sharp = require('sharp')
-const AppError = require('./../utils/appError')
+const path = require('path');
+const multer = require('multer');
+const sharp = require('sharp');
+const AppError = require('./../utils/appError');
 
 // const upload = multer() // Without any options, multerr will store file in memeory and provide it with req.file
 // const upload = multer({ dest: path.join(__dirname, '..', '/uploads/images') }) //
@@ -20,81 +20,81 @@ const AppError = require('./../utils/appError')
 //     }
 // })
 
-const multerStorage = multer.memoryStorage()
+const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
-    // console.log(file)
-    if(file.mimetype.startsWith('image')) {
-        cb(null, true)
-    } else {
-        cb(new AppError('File is not an image', 400), false)
-    }
-}
+  // console.log(file)
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('File is not an image', 400), false);
+  }
+};
 
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter })
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
-exports.uploadUserPhoto = upload.single('photo')
+exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadTourPhotos = upload.fields([
-    { name: 'imageCover', maxCount: 1 },
-    { name: 'images', maxCount: 3 }
-])
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
 
 exports.resizeUserPhoto = (req, res, next) => {
-    if(!req.file) {
-        return next()
-    }
+  if (!req.file) {
+    return next();
+  }
 
-    const userId = req.user.id
-    const timestamp = Date.now()
-    req.file.filename = `user-${userId}-${timestamp}.jpeg`
+  const userId = req.user.id;
+  const timestamp = Date.now();
+  req.file.filename = `user-${userId}-${timestamp}.jpeg`;
 
-    sharp(req.file.buffer)
-        .resize(500, 500)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`uploads/img/users/${req.file.filename}`) // https://sharp.pixelplumbing.com
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`uploads/img/users/${req.file.filename}`); // https://sharp.pixelplumbing.com
 
-    next()
-}
+  next();
+};
 
 exports.resizeTourPhotos = async (req, res, next) => {
-    console.log("req.files")
-    console.log(req.files)
-    if(!req.files.imageCover || !req.files.images) {
-        return next()
-    }
+  console.log('req.files');
+  console.log(req.files);
+  if (!req.files.imageCover || !req.files.images) {
+    return next();
+  }
 
-    // Image cover
-    const tourId = req.params.id
-    const timestamp = Date.now()
-    req.body.imageCover = `tour-${tourId}-${timestamp}-cover.jpeg`
+  // Image cover
+  const tourId = req.params.id;
+  const timestamp = Date.now();
+  req.body.imageCover = `tour-${tourId}-${timestamp}-cover.jpeg`;
 
-    await sharp(req.files.imageCover[0].buffer)
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`); // https://sharp.pixelplumbing.com
+
+  // Files
+  req.body.images = [];
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const tourId = req.params.id;
+      const timestamp = Date.now();
+      const filename = `tour-${tourId}-${timestamp}-${i + 1}.jpeg`;
+
+      await sharp(file.buffer)
         .resize(2000, 1333)
         .toFormat('jpeg')
         .jpeg({ quality: 90 })
-        .toFile(`public/img/tours/${req.body.imageCover}`) // https://sharp.pixelplumbing.com
+        .toFile(`public/img/tours/${filename}`); // https://sharp.pixelplumbing.com
 
-    // Files
-    req.body.images = []
-    await Promise.all(
-        req.files.images.map(async (file, i) => {
-            const tourId = req.params.id
-            const timestamp = Date.now()
-            const filename = `tour-${tourId}-${timestamp}-${i + 1}.jpeg`
+      req.body.images.push(filename);
+    })
+  );
 
-            await sharp(file.buffer)
-                .resize(2000, 1333)
-                .toFormat('jpeg')
-                .jpeg({ quality: 90 })
-                .toFile(`public/img/tours/${filename}`) // https://sharp.pixelplumbing.com
+  console.log(req.body.images);
 
-            req.body.images.push(filename)
-        })
-    )
-
-    console.log(req.body.images)
-
-    next()
-}
+  next();
+};
