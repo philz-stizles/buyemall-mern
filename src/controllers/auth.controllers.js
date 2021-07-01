@@ -9,18 +9,22 @@ const catchAsync = require('../utils/catchAsync');
 const User = require('../models/user.model');
 const { createAndSendTokenWithCookie } = require('../utils/api.utils');
 const awsService = require('../services/aws/ses.services');
-const { createUser } = require('../services/mongo/user.services');
+const {
+  createUser,
+  authenticateUser,
+} = require('../services/mongo/user.services');
 
 exports.signup = async (req, res, next) => {
-  const { name, email, password, confirmPassword } = req.body;
+  const { fullname, email, password, confirmPassword, accountType } = req.body;
 
   try {
     const newUser = await createUser({
-      name,
+      fullname,
       email,
       password,
       confirmPassword,
-      role: ['customer'],
+      accountType,
+      role: [accountType],
     });
     const token = generateToken({ id: newUser._id });
 
@@ -150,33 +154,24 @@ exports.signupWithEmailActivation = (req, res) => {
   );
 };
 
-exports.login = catchAsync(async (req, res, next) => {
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Check if user exists
-  const existingUser = await User.findOne({ email }).select('+password'); // There is difference between adding
-  // +password and just password. +password will add to already visible fields if not already visible
-  // password without the + would select just that field as visible and will continue to include any new fields that
-  // you specify to the list of included fields. The _id is always returned accept you specify otherwise
-  // e.g .select('+password -_id')
-  if (!existingUser)
-    return next(new AppError('Incorrect email or password', 401));
+  try {
+    // Authenticate by verifying the users email and password
+    const existingUser = await authenticateUser({ email, password });
 
-  // Check if password matches
-  const isMatch = await existingUser.comparePassword(password);
-  if (!isMatch) return next(new AppError('Incorrect email or password', 401));
-
-  // Generate token
-  // const token = generateToken(existingUser);
-
-  return createAndSendTokenWithCookie(
-    existingUser,
-    200,
-    req,
-    res,
-    'Login successful'
-  );
-});
+    return createAndSendTokenWithCookie(
+      existingUser,
+      200,
+      req,
+      res,
+      'Login successful'
+    );
+  } catch (error) {
+    return next(error);
+  }
+};
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;

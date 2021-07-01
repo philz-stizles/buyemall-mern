@@ -94,11 +94,11 @@ const createAndSendTokenWithCookie = (user, statusCode, req, res, message) => {
   // }
 
   res.cookie('token', token, cookieOptions);
-
-  const retrievedUser = { ...user, password: undefined };
-  res
-    .status(statusCode)
-    .json({ status: true, token, data: { user: retrievedUser }, message });
+  res.status(statusCode).json({
+    status: true,
+    data: { user: user.loginCredentials(), token },
+    message,
+  });
 };
 
 module.exports = {

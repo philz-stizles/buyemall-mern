@@ -13,6 +13,12 @@ exports.createUser = async modelObject => {
   return newUser;
 };
 
+exports.authenticateUser = async credentials => {
+  const existingUser = await User.findByAuthentication(credentials);
+
+  return existingUser;
+};
+
 exports.findUser = async query => {
   // If you're executing a query and sending the results without modification to, say, an Express response,
   // you should use lean.In general, if you do not modify the query results and do not use custom getters,

@@ -1,4 +1,4 @@
-const BadRequestError = require('../../errors/bad-request');
+const RequestValidationError = require('../../errors/request-validation');
 const logger = require('../../loggers/logger');
 
 const validationRequest = schema => async (req, res, next) => {
@@ -12,7 +12,7 @@ const validationRequest = schema => async (req, res, next) => {
     return next();
   } catch (e) {
     logger.error('YUP VALIDATION MIDDLEWARE', e.message, e);
-    return next(new BadRequestError());
+    return next(new RequestValidationError(e.errors));
   }
 };
 

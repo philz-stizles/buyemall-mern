@@ -10,6 +10,10 @@ class BadRequestError extends CustomError {
     // Because we are extending a built-in class
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
+
+  serializeErrors() {
+    return [{ message: this.message }];
+  }
 }
 
 module.exports = BadRequestError;

@@ -2,16 +2,30 @@ const { Schema, model, Types } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const UnAuthorizedError = require('../errors/unauthorized');
 
 // Put as much business logic in the models to keep the controllers as simple and lean as possible
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema(
   {
+    fullname: {
+      type: String,
+      required: [true, 'Full name is required'],
+      trim: true,
+    },
+    username: {
+      type: String,
+      trim: true,
+      index: true,
+      unique: true,
+      sparse: true,
+    },
     name: {
       type: String,
-      required: [true, 'A user must have a name'],
       trim: true,
+      index: true,
       unique: true,
+      sparse: true,
     },
     email: {
       type: String,
@@ -26,7 +40,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, 'Please provide a password'],
       minLength: 6,
-      select: false,
+      // select: false,
     }, // Using select: false
     // will omit the field that it is assigned to from any read executions e.g find, findOne  etc.
     // It will not omit from create, save
@@ -49,9 +63,6 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// Create a Model.
-const User = model('User', userSchema);
 
 // Create schema methods
 userSchema.pre('save', async function (next) {
@@ -146,18 +157,18 @@ userSchema.methods.createPasswordResetToken = function () {
 //   next();
 // });
 
-userSchema.statics.findByAuthentication = async (email, password) => {
+userSchema.statics.findByAuthentication = async function ({ email, password }) {
   // You can use arrow functions here as we will not be requiring
   // the 'this' reference
-  const user = await User.findOne({ email });
+  const user = await this.findOne({ email });
   if (!user) {
-    throw new Error('Invalid Credentials');
+    throw new UnAuthorizedError('Invalid Credentials');
   }
 
   const isMatch = await user.comparePassword(password);
-  // console.log(isMatch)
+
   if (!isMatch) {
-    throw new Error('Invalid Credentials');
+    throw new UnAuthorizedError('Invalid Credentials');
   }
 
   return user;
@@ -193,6 +204,14 @@ userSchema.methods.getPublicProfile = function () {
   return userObject;
 };
 
+userSchema.methods.loginCredentials = function () {
+  const user = this;
+  const userObject = user.toObject();
+  const { _id, fullname, email, role } = userObject;
+
+  return { _id, email, role, fullname };
+};
+
 // userSchema.methods.toJSON = function () {
 //   const user = this;
 
@@ -208,4 +227,6 @@ userSchema.methods.getPublicProfile = function () {
 //   return userObject;
 // };
 
+// Create a Model.
+const User = model('User', userSchema);
 module.exports = User;
