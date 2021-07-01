@@ -1,33 +1,32 @@
-import { FilterQuery } from 'mongoose';
-import { Request, Response } from 'express';
-import slugify from 'slugify';
-import Category, { ICategoryDocument } from '@src/models/category.model';
-import Product from '@src/models/product.model';
-import Sub from '@src/models/subCategory.model';
+const slugify = require('slugify');
+const Category = require('../models/category.model');
+const Product = require('../models/product.model');
+const Sub = require('../models/subCategory.model');
 
-export const create = async (req: Request, res: Response): Promise<void> => {
+exports.create = async (req, res) => {
   try {
     const { name } = req.body;
     const category = await new Category({ name, slug: slugify(name) }).save();
     res.status(201).json(category);
   } catch (err) {
-    // console.log(err);
     res.status(400).send('Create category failed');
   }
 };
 
-export const list = async (req: Request, res: Response): Promise<void> => {
+exports.list = async (req, res) => {
   const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
   res.json(categories);
 };
 
-export const read = async (req: Request, res: Response): Promise<Response> => {
+exports.read = async (req, res) => {
   const category = await Category.findOne({ slug: req.params.slug }).exec();
   if (!category) {
     return res.status(404).json({ status: false });
   }
 
-  const products = await Product.find({ category } as FilterQuery<ICategoryDocument>)
+  const products = await Product.find({
+    category,
+  })
     .populate('category')
     .exec();
   // const products = await Product.find({ category }).populate('category').exec();
@@ -35,7 +34,7 @@ export const read = async (req: Request, res: Response): Promise<Response> => {
   return res.json({ category, products });
 };
 
-export const update = async (req: Request, res: Response): Promise<void> => {
+exports.update = async (req, res) => {
   const { name } = req.body;
   try {
     const updatedCategory = await Category.findOneAndUpdate(
@@ -49,16 +48,18 @@ export const update = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const remove = async (req: Request, res: Response): Promise<void> => {
+exports.remove = async (req, res) => {
   try {
-    const deletedCategory = await Category.findOneAndDelete({ slug: req.params.slug });
+    const deletedCategory = await Category.findOneAndDelete({
+      slug: req.params.slug,
+    });
     res.json(deletedCategory);
   } catch (err) {
     res.status(400).send('Create delete failed');
   }
 };
 
-export const getCategorySubs = (req: Request, res: Response): void => {
+exports.getCategorySubs = (req, res) => {
   return Sub.find({ parent: req.params._id }).exec((err, subs) => {
     if (err) {
       console.log(err);

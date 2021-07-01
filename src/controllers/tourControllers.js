@@ -1,4 +1,4 @@
-const Tour = require('./../models/tourModel');
+const Tour = require('../models/tour.model');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
@@ -16,14 +16,21 @@ const searchTours = catchAsync(async (req, res, next) => {
 
   const tours = tours.filter(t => t.name.includes(searchTerm));
 
-  res.status(200).json({ status: true, data: tours, message: 'retrieved successfully' });
+  res
+    .status(200)
+    .json({ status: true, data: tours, message: 'retrieved successfully' });
 });
 
 const getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
   if (!lat || !lng)
-    return next(new AppError('Please provide latitude and longitude the the format lat,lng', 400));
+    return next(
+      new AppError(
+        'Please provide latitude and longitude the the format lat,lng',
+        400
+      )
+    );
 
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
 
@@ -33,14 +40,21 @@ const getToursWithin = catchAsync(async (req, res, next) => {
     },
   });
 
-  res.status(200).json({ status: true, data: tours, message: 'retrieved successfully' });
+  res
+    .status(200)
+    .json({ status: true, data: tours, message: 'retrieved successfully' });
 });
 
 const getDistances = catchAsync(async (req, res, next) => {
   const { latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
   if (!lat || !lng)
-    return next(new AppError('Please provide latitude and longitude the the format lat,lng', 400));
+    return next(
+      new AppError(
+        'Please provide latitude and longitude the the format lat,lng',
+        400
+      )
+    );
   const multiplier = unit === 'mi' ? 0.0000621371 : 0.001;
   const distances = await Tour.aggregate([
     {
@@ -58,7 +72,9 @@ const getDistances = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  res.status(200).json({ status: true, data: distances, message: 'retrieved successfully' });
+  res
+    .status(200)
+    .json({ status: true, data: distances, message: 'retrieved successfully' });
 });
 
 const getTourStats = catchAsync(async (req, res, next) => {

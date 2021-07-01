@@ -1,12 +1,11 @@
-import slugify from 'slugify';
-import { Request, Response } from 'express';
+const slugify = require('slugify');
 // Models
-import Product from '@src/models/product.model';
-import User from '@src/models/user.model';
+const Product = require('../models/product.model');
+const User = require('../models/user.model');
 // Services
-import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
+const cloudinaryService = require('../services/cloudinary/cloudinary.services');
 
-export const create = async (req: Request, res: Response): Promise<void> => {
+export const create = async (req, res) => {
   try {
     console.log(req.body);
     req.body.slug = slugify(req.body.title);
@@ -21,10 +20,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const uploadFile = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const uploadFile = async (req, res) => {
   console.log(req.body.image);
   const result = await cloudinaryService.uploadFile(req.body.image);
 
@@ -34,27 +30,17 @@ export const uploadFile = async (
   });
 };
 
-export const removeFile = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  await cloudinaryService.removeFile(
-    req.body.public_id,
-    (err, result): Response => {
-      console.log('error', err);
-      console.log('result', result);
-      if (err) return res.json({ success: false, err });
-      return res.send('ok');
-    }
-  );
+export const removeFile = async (req, res) => {
+  await cloudinaryService.removeFile(req.body.public_id, (err, result) => {
+    console.log('error', err);
+    console.log('result', result);
+    if (err) return res.json({ success: false, err });
+    return res.send('ok');
+  });
 };
 
-type ProductQuery = {
-  limit: string;
-};
-
-export const listAll = async (req: Request, res: Response): Promise<void> => {
-  const { limit } = req.query as ProductQuery;
+export const listAll = async (req, res) => {
+  const { limit } = req.query;
   const products = await Product.find({})
     .limit(parseInt(limit, 10))
     .populate('category')
@@ -64,10 +50,7 @@ export const listAll = async (req: Request, res: Response): Promise<void> => {
   res.json(products);
 };
 
-export const remove = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const remove = async (req, res) => {
   try {
     const deleted = await Product.findOneAndRemove({
       slug: req.params.slug,
@@ -79,7 +62,7 @@ export const remove = async (
   }
 };
 
-export const read = async (req: Request, res: Response): Promise<void> => {
+export const read = async (req, res) => {
   const product = await Product.findOne({ slug: req.params.slug })
     .populate('category')
     .populate('subs')
@@ -87,7 +70,7 @@ export const read = async (req: Request, res: Response): Promise<void> => {
   res.json(product);
 };
 
-export const update = async (req: Request, res: Response): Promise<void> => {
+export const update = async (req, res) => {
   try {
     if (req.body.title) {
       req.body.slug = slugify(req.body.title);
@@ -110,7 +93,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 };
 
 // WITHOUT PAGINATION
-// export const list = async (req: Request, res: Response) => {
+// export const list = async (req, res) => {
 //   try {
 //     // createdAt/updatedAt, desc/asc, 3
 //     const { sort, order, limit } = req.body;
@@ -128,7 +111,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 // };
 
 // WITH PAGINATION
-export const list = async (req: Request, res: Response): Promise<void> => {
+export const list = async (req, res) => {
   // console.table(req.body);
   try {
     // createdAt/updatedAt, desc/asc, 3
@@ -150,18 +133,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getProductsTotal = async (
-  _req: Request,
-  res: Response
-): Promise<Response> => {
+export const getProductsTotal = async (_req, res) => {
   const total = await Product.find({}).estimatedDocumentCount().exec();
   return res.json(total);
 };
 
-export const setProductRating = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const setProductRating = async (req, res) => {
   const existingProduct = await Product.findById(req.params.productId).exec();
   if (!existingProduct) {
     return res.status(404);
@@ -204,16 +181,13 @@ export const setProductRating = async (
   return res.json(ratingUpdated);
 };
 
-export const listRelatedProducts = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const listRelatedProducts = async (req, res) => {
   const targetProduct = await Product.findById(req.params.productId).exec();
   if (!targetProduct) {
     return res.status(404);
   }
 
-  const { limit } = req.query as ProductQuery;
+  const { limit } = req.query;
 
   const relatedProducts = await Product.find({
     _id: { $ne: targetProduct._id },
@@ -228,9 +202,9 @@ export const listRelatedProducts = async (
   return res.json(relatedProducts);
 };
 
-// SERACH / FILTER
+// SEARCH / FILTER
 
-const handleQuery = async (req: Request, res: Response, query: string) => {
+const handleQuery = async (req, res, query) => {
   const products = await Product.find({ $text: { $search: query } })
     .populate('category', '_id name')
     .populate('subs', '_id name')
@@ -240,7 +214,7 @@ const handleQuery = async (req: Request, res: Response, query: string) => {
   res.json(products);
 };
 
-const handlePrice = async (_req: Request, res: Response, price: number[]) => {
+const handlePrice = async (_req, res, price) => {
   try {
     const products = await Product.find({
       price: {
@@ -259,11 +233,7 @@ const handlePrice = async (_req: Request, res: Response, price: number[]) => {
   }
 };
 
-const handleCategory = async (
-  req: Request,
-  res: Response,
-  category: string
-) => {
+const handleCategory = async (req, res, category) => {
   try {
     const products = await Product.find({ category })
       .populate('category', '_id name')
@@ -277,7 +247,7 @@ const handleCategory = async (
   }
 };
 
-const handleStar = (_req: Request, res: Response, stars: number) => {
+const handleStar = (_req, res, stars) => {
   Product.aggregate([
     {
       $project: {
@@ -304,7 +274,7 @@ const handleStar = (_req: Request, res: Response, stars: number) => {
     });
 };
 
-const handleSub = async (req: Request, res: Response, sub: string) => {
+const handleSub = async (req, res, sub) => {
   const products = await Product.find({ subs: sub })
     .populate('category', '_id name')
     .populate('subs', '_id name')
@@ -314,11 +284,7 @@ const handleSub = async (req: Request, res: Response, sub: string) => {
   res.json(products);
 };
 
-const handleShipping = async (
-  req: Request,
-  res: Response,
-  shipping: string
-) => {
+const handleShipping = async (req, res, shipping) => {
   const products = await Product.find({ shipping })
     .populate('category', '_id name')
     .populate('subs', '_id name')
@@ -328,7 +294,7 @@ const handleShipping = async (
   res.json(products);
 };
 
-const handleColor = async (req: Request, res: Response, color: string) => {
+const handleColor = async (req, res, color) => {
   const products = await Product.find({ color })
     .populate('category', '_id name')
     .populate('subs', '_id name')
@@ -338,7 +304,7 @@ const handleColor = async (req: Request, res: Response, color: string) => {
   res.json(products);
 };
 
-const handleBrand = async (req: Request, res: Response, brand: string) => {
+const handleBrand = async (req, res, brand) => {
   const products = await Product.find({ brand })
     .populate('category', '_id name')
     .populate('subs', '_id name')
@@ -348,10 +314,7 @@ const handleBrand = async (req: Request, res: Response, brand: string) => {
   res.json(products);
 };
 
-export const searchFilters = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const searchFilters = async (req, res) => {
   const { query, price, category, stars, sub, shipping, color, brand } =
     req.body;
 

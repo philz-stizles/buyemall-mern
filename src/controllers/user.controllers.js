@@ -1,15 +1,13 @@
-import { NextFunction, Request, Response } from 'express';
-import _ from 'lodash';
-import User from '../models/user.model';
-import { filterRequestBody, createAndSendTokenWithCookie } from '../utils/apiUtils';
-import AppError from '../utils/appError';
-import { generateToken } from '../utils/authUtils';
-import catchAsync from '../utils/catchAsync';
-import * as factory from './handlerFactory';
-import { IAuthRequest } from '@src/interfaces/AuthRequest';
-import Order, { OrderDocument } from '../models/order.model';
+const _ = require('lodash');
+const User = require('../models/user.model');
+const { filterRequestBody, createAndSendTokenWithCookie } = require('../utils/apiUtils');
+const AppError = require('../utils/appError');
+const { generateToken } = require('../utils/authUtils');
+const factory = require('./handlerFactory');
+const { IAuthRequest } = require('@src/interfaces/AuthRequest');
+const Order = require('../models/order.model');
 
-export const createUser = catchAsync(async (req: Request, res: Response) => {
+export const createUser = async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
 
   const newUser = await User.create({ name, email, password, confirmPassword });
@@ -26,7 +24,7 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const createOrUpdate = async (req: Request, res: Response): Promise<void> => {
+export const createOrUpdate = async (req, res) => {
   console.log(req.user);
   const { name, avatar, email } = req.user;
   console.log('before');
@@ -52,7 +50,7 @@ export const createOrUpdate = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const updateMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const updateMe = async (req, res, next: NextFunction) => {
   // Check that password is not being updated here
   if (req.body.password || req.body.confirmPassword) {
     return next(new AppError('You cannot update passwords', 400));
@@ -72,16 +70,16 @@ export const updateMe = catchAsync(async (req: Request, res: Response, next: Nex
   });
 
   return res.json({ status: true, data: updatedUser, message: 'Updated successfully' });
-});
+};
 
-export const deleteMe = catchAsync(async (req: IAuthRequest, res: Response) => {
+export const deleteMe = async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, { isActive: false });
 
   res.status(204).json({ status: true, data: null });
-});
+};
 
-export const changePassword = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+export const changePassword = 
+  async (req, res, next: NextFunction) => {
     // Check if user exists - Find the user by id
     const existingUser = await User.findById(req.user.id).select('+password');
     if (!existingUser) return next(new AppError('user invalid', 400));
@@ -114,7 +112,7 @@ export const getUser = factory.getOne(User);
 export const updateUser = factory.updateOne(User);
 export const deleteUser = factory.deleteOne(User);
 
-export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+export const getCurrentUser = async (req, res) => {
   User.findOne({ email: req.user.email }).exec((error, existingUser) => {
     console.log(error, existingUser);
     if (error || !existingUser) throw new Error(error?.message);
@@ -123,13 +121,13 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
   });
 };
 
-export const saveUserAddress = async (req: Request, res: Response): Promise<void> => {
+export const saveUserAddress = async (req, res) => {
   await User.findOneAndUpdate({ email: req.user.email }, { address: req.body.address }).exec();
 
   res.json({ ok: true });
 };
 
-export const addToWishlist = async (req: Request, res: Response): Promise<void> => {
+export const addToWishlist = async (req, res) => {
   const { productId } = req.body;
 
   await User.findOneAndUpdate(
@@ -140,7 +138,7 @@ export const addToWishlist = async (req: Request, res: Response): Promise<void> 
   res.json({ ok: true });
 };
 
-export const wishlist = async (req: Request, res: Response): Promise<void> => {
+export const wishlist = async (req, res) => {
   const userWishList = await User.findOne({ email: req.user.email })
     .select('wishlist')
     .populate('wishlist')
@@ -149,14 +147,14 @@ export const wishlist = async (req: Request, res: Response): Promise<void> => {
   res.json(userWishList);
 };
 
-export const removeFromWishlist = async (req: Request, res: Response): Promise<any> => {
+export const removeFromWishlist = async (req, res): Promise<any> => {
   const { productId } = req.params;
   await User.findOneAndUpdate({ email: req.user.email }, { $pull: { wishlist: productId } }).exec();
 
   res.json({ ok: true });
 };
 
-export const getAllOrders = async (_req: Request, res: Response): Promise<void> => {
+export const getAllOrders = async (_req, res) => {
   const allOrders: OrderDocument[] = await Order.find({})
     .sort('-createdAt')
     .populate('products.product')
@@ -165,7 +163,7 @@ export const getAllOrders = async (_req: Request, res: Response): Promise<void> 
   res.json(allOrders);
 };
 
-export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+export const updateOrderStatus = async (req, res) => {
   const { orderId, orderStatus } = req.body;
 
   const updated: OrderDocument | null = await Order.findByIdAndUpdate(
@@ -178,7 +176,7 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
 };
 
 // MIDDLEWARES
-export const getMe = catchAsync(async (req: IAuthRequest, next: NextFunction) => {
+export const getMe = async (req: IAuthRequest, next: NextFunction) => {
   req.params.id = req.user.id;
   next();
 });
