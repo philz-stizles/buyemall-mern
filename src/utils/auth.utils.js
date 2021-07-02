@@ -7,5 +7,9 @@ exports.generateToken = payload =>
   });
 
 exports.verifyToken = async token => {
-  await promisify(jwt.verify)(token, process.env.JWT_AUTH_SECRET);
+  const decodedToken = await promisify(jwt.verify)(
+    token,
+    process.env.JWT_AUTH_SECRET
+  );
+  return decodedToken;
 };

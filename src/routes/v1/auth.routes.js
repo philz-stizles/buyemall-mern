@@ -6,7 +6,7 @@ const {
 const {
   signup,
   signupWithEmailVerification,
-  signupWithEmailActivation,
+  emailActivation,
   login,
   forgotPassword,
   resetPassword,
@@ -20,11 +20,11 @@ const router = express.Router();
 router.post('/signup', validationRequest(signupSchema), signup);
 router.post(
   '/signup-with-email-verification',
-  // validationRequest(signupSchema),
+  validationRequest(signupSchema),
   signupWithEmailVerification
 );
-router.post('/signup-with-email-activation', signupWithEmailActivation);
-router.post('/create-business', signup);
+router.post('/emailActivation', emailActivation);
+router.post('/createBusiness', signup);
 router.post('/login', validationRequest(loginSchema), login);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);

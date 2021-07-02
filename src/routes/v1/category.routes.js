@@ -1,22 +1,17 @@
-import { Router } from 'express';
-import {
-  create,
-  read,
-  update,
-  remove,
+const { Router } = require('express');
+const {
+  createCategory,
+  getCategory,
+  getCategoryAndProducts,
+  updateCategory,
+  removeCategory,
   list,
-  getCategorySubs,
-} from '@src/controllers/category.controllers';
-import { authenticate } from '@src/middlewares/auth.middlewares';
+  listMyCategories,
+  getCategoryAndSubs,
+} = require('../../controllers/category.controllers');
+const { authenticate } = require('../../middlewares/auth.middlewares');
 
 const router = Router();
-
-/**
- *@swagger
- * tags:
- *    name: Categories
- *    description: The Category managing API
- */
 
 /**
  *@swagger
@@ -38,34 +33,8 @@ const router = Router();
  *        description: Affordable shoes
  */
 router
-  .route('/categories')
-  /**
-   *@swagger
-   * /categories:
-   *    post:
-   *      summary: Create a new category
-   *      tags: [Categories]
-   *      requestBody:
-   *        required: true
-   *        content:
-   *          application/json:
-   *            schema:
-   *                $ref: "#/components/schemas/CategoryInput"
-   *      responses:
-   *        200:
-   *          description: Request was successful
-   *          content:
-   *            application/json:
-   *              schema:
-   *                $ref: "#/components/schemas/CategoryInput"
-   *        401:
-   *          description: Unauthorized access
-   *        404:
-   *          description: Dependency was not found
-   *        500:
-   *          description: Server error
-   */
-  .post(authenticate, create)
+  .route('/')
+  .post(authenticate, createCategory)
   /**
    *@swagger
    * /categories:
@@ -92,8 +61,10 @@ router
    */
   .get(list);
 
+router.route('/me').get(authenticate, listMyCategories);
+
 router
-  .route('/categories/:slug')
+  .route('/:slug')
   /**
    *@swagger
    * /categories/{slug}:
@@ -117,7 +88,7 @@ router
    *        404:
    *          description: The specified category was not found
    */
-  .get(read)
+  .get(getCategory)
   /**
    *@swagger
    * /categories:
@@ -151,7 +122,7 @@ router
    *        500:
    *          description: Server error
    */
-  .put(authenticate, update)
+  .put(authenticate, updateCategory)
   /**
    *@swagger
    * /categories:
@@ -179,8 +150,10 @@ router
    *        500:
    *          description: Server error
    */
-  .delete(authenticate, remove);
+  .delete(authenticate, removeCategory);
 
-router.get('/categories/:_id/subs', getCategorySubs);
+router.get('/:slug/products', getCategoryAndProducts);
 
-export default router;
+router.get('/:slug/subCategories', getCategoryAndSubs);
+
+module.exports = router;

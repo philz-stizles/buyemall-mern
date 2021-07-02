@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
-import Coupon from '../models/coupon.model';
+const Coupon = require('../models/coupon.model');
 
 // create, remove, list
 
-export const create = async (req: Request, res: Response): Promise<void> => {
+export const create = async (req, res) => {
   try {
     const { name, expiry, discount } = req.body;
     const newCoupon = await new Coupon({ name, expiry, discount }).save();
@@ -13,7 +12,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const remove = async (req: Request, res: Response): Promise<void> => {
+export const remove = async (req, res) => {
   try {
     res.json(await Coupon.findByIdAndDelete(req.params.couponId).exec());
   } catch (err) {
@@ -21,7 +20,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const list = async (req: Request, res: Response): Promise<void> => {
+export const list = async (req, res) => {
   try {
     res.json(await Coupon.find({}).sort({ createdAt: -1 }).exec());
   } catch (err) {

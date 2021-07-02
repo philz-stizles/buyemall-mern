@@ -53,7 +53,7 @@ exports.sendPasswordResetMail = (email, token) => {
                         <html>
                             <h1>Reset your password</h1>
                             <p>Please use the following link to reset your password:</p>
-                            <p>${process.env.CLIENT_URL}/auth/password/reset/${token}</p>
+                            <p>${process.env.RESET_PASSWORD_URL}/${token}</p>
                         </html>
                     `,
         },

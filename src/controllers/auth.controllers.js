@@ -1,9 +1,6 @@
-const crypto = require('crypto');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const shortId = require('shortid');
-const { sendPlainEmail } = require('../services/email');
-const AppError = require('../utils/app.error');
 const { generateToken } = require('../utils/auth.utils');
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/user.model');
@@ -12,7 +9,11 @@ const awsService = require('../services/aws/ses.services');
 const {
   createUser,
   authenticateUser,
+  activateResetPassword,
+  reversePasswordReset,
+  resetUserPassword,
 } = require('../services/mongo/user.services');
+const BadRequestError = require('../errors/bad-request');
 
 exports.signup = async (req, res, next) => {
   const { fullname, email, password, confirmPassword, accountType } = req.body;
@@ -90,7 +91,7 @@ exports.signupWithEmailVerification = (req, res) => {
   });
 };
 
-exports.signupWithEmailActivation = (req, res) => {
+exports.emailActivation = (req, res) => {
   const { token } = req.body;
 
   // Check that activation token has not expred
@@ -173,80 +174,54 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.forgotPassword = catchAsync(async (req, res, next) => {
+exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
-  // Validate user email
-  const existingUser = await User.findOne({ email });
-  if (!existingUser)
-    return next(new AppError('User with email address does not exist', 401));
-
-  // Generate reset password token
-  const passwordResetToken = existingUser.createPasswordResetToken();
-  await existingUser.save({ validateBeforeSave: false }); // At this point you are setting password reset token and saving
-  // The save method will run validations on inputs and will fail due to the lack of for example confirm password etc
-  // set validateBeforeSave: false for this particular operation as we do not need confirm password validation here
-
-  // Send to user as an email
-  const resetPasswordUrl = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/auth/resetPassword/${passwordResetToken}`;
-  const message = `Forgot your password, submit a request with your new password and password confirm
-        to: ${resetPasswordUrl}.\nIf you didn't forget your password, please ignore this email
-    `;
-  const subject = 'Reset your password(valid for 10mins)';
 
   try {
-    await sendPlainEmail({ email: existingUser.email, subject, message });
+    // Generate reset password token
+    const mailSent = await activateResetPassword(email, req);
+
+    console.log('auth', mailSent);
+
+    if (!mailSent) {
+      reversePasswordReset(email);
+      throw new BadRequestError(
+        'Password cannot be reset at this time. Please try again later'
+      );
+    }
 
     return res.json({
       status: true,
-      message: 'Password reset has been sent to email',
+      message: 'Password reset has been sent to your email',
     });
   } catch (error) {
-    existingUser.passwordResetToken = undefined;
-    existingUser.passwordResetExpiresIn = undefined;
-    existingUser.save();
-    // await existingUser.save({ validateBeforeSave: false })
-    return next(
-      new AppError(
-        'Cannot send password reset email at the moment, please try again later',
-        500
-      )
-    );
+    return next(error);
   }
-});
+};
 
-exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { params } = req;
-  // Hash unhashed password reset token
-  const currentHashedToken = crypto
-    .createHash('sha256')
-    .update(params.token)
-    .digest('hex');
+exports.resetPassword = async (req, res, next) => {
+  const { password, confirmPassword } = req.body;
+  const { token } = req.params;
 
-  // Find a user with this hashed token
-  const existingUser = await User.findOne({
-    passwordResetToken: currentHashedToken,
-    passwordResetExpiresIn: { $gt: Date.now() },
-  });
-  if (!existingUser)
-    return next(new AppError('Token is either invalid or has expired', 400));
+  try {
+    const existingUser = await resetUserPassword(
+      token,
+      password,
+      confirmPassword
+    );
 
-  existingUser.password = req.body.password;
-  existingUser.confirmPassword = req.body.confirmPassword;
-  existingUser.passwordResetToken = undefined;
-  existingUser.passwordResetExpiresIn = undefined;
-  await existingUser.save();
+    // Generate token
+    const loginToken = generateToken({ id: existingUser._id });
 
-  // Generate token
-  const token = generateToken({ id: existingUser._id });
-
-  return res.json({
-    status: true,
-    data: token,
-    message: 'Password reset successful',
-  });
-});
+    return res.json({
+      status: true,
+      data: loginToken,
+      message: 'Password reset successful',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 exports.logoutCookie = catchAsync(async (req, res) => {
   res.cookie('token', 'loggedout', {

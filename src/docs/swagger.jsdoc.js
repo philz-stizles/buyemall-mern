@@ -1,4 +1,4 @@
-import swaggerJSDoc from 'swagger-jsdoc';
+const swaggerJSDoc = require('swagger-jsdoc');
 
 const options = {
   definition: {
@@ -27,6 +27,4 @@ const options = {
   apis: ['./src/routes/v1/*.ts'], // files containing annotations as above
 };
 
-const openapiSpecification = swaggerJSDoc(options);
-
-export default openapiSpecification;
+module.exports = swaggerJSDoc(options);

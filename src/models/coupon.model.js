@@ -1,11 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
-
-export interface ICouponDocument extends Document {
-  name: string;
-  expiry: Date;
-  discount: number;
-  // creator: Types.ObjectId;
-}
+const { Schema, Types, model } = require('mongoose');
 
 const couponSchema = new Schema(
   {
@@ -20,11 +13,12 @@ const couponSchema = new Schema(
     },
     expiry: { type: Date, required: true },
     discount: { type: Number, required: true },
-    // creator: { type: Types.ObjectId, ref: 'Business' },
+    creator: {
+      user: { type: Types.ObjectId, ref: 'Business' },
+      business: { type: Types.ObjectId, ref: 'User' },
+    },
   },
   { timestamps: true }
 );
 
-const Coupon = model<ICouponDocument>('Coupon', couponSchema);
-
-export default Coupon;
+module.exports = model('Coupon', couponSchema);

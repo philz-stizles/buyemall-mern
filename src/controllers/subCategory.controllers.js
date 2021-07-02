@@ -2,7 +2,7 @@ const slugify = require('slugify');
 const SubCategory = require('../models/subCategory.model');
 const Product = require('../models/product.model');
 
-export const create = async (req, res) => {
+exports.create = async (req, res) => {
   try {
     const { name, parent } = req.body;
     res.json(
@@ -14,10 +14,10 @@ export const create = async (req, res) => {
   }
 };
 
-export const list = async (req, res) =>
+exports.list = async (req, res) =>
   res.json(await SubCategory.find({}).sort({ createdAt: -1 }).exec());
 
-export const read = async (req, res) => {
+exports.read = async (req, res) => {
   const subCategory = await SubCategory.findOne({
     slug: req.params.slug,
   }).exec();
@@ -30,7 +30,7 @@ export const read = async (req, res) => {
   res.json({ subCategory, products });
 };
 
-export const update = async (req, res) => {
+exports.update = async (req, res) => {
   const { name, parent } = req.body;
   try {
     const updated = await SubCategory.findOneAndUpdate(
@@ -44,7 +44,7 @@ export const update = async (req, res) => {
   }
 };
 
-export const remove = async (req, res) => {
+exports.remove = async (req, res) => {
   try {
     const deleted = await SubCategory.findOneAndDelete({
       slug: req.params.slug,

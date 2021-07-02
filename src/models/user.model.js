@@ -130,7 +130,7 @@ userSchema.methods.isPasswordChangedAfterTokenGen = function (jwtTimestamp) {
   return passwordChangedAtInSeconds > jwtTimestamp;
 };
 
-userSchema.methods.createPasswordResetToken = function () {
+userSchema.methods.createPasswordResetToken = async function () {
   const user = this;
   const resetToken = crypto.randomBytes(32).toString('hex');
   user.passwordResetToken = crypto
@@ -139,6 +139,8 @@ userSchema.methods.createPasswordResetToken = function () {
     .digest('hex');
 
   user.passwordResetExpiresIn = Date.now() + 10 * 60 * 1000;
+
+  await user.save({ validateBeforeSave: false });
 
   return resetToken;
 };

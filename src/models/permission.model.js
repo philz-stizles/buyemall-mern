@@ -1,10 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
-
-export interface IPermissionDocument extends Document {
-  name: string;
-  description: string;
-  permissions: string[];
-}
+const { Schema, model } = require('mongoose');
 
 // Put as much business logic in the models to keep the controllers as simple and lean as possible
 const permissionSchema = new Schema(
@@ -25,6 +19,4 @@ const permissionSchema = new Schema(
   { timestamps: true }
 );
 
-const Permission = model<IPermissionDocument>('Permission', permissionSchema);
-
-export default Permission;
+module.exports = model('Permission', permissionSchema);

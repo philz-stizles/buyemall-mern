@@ -1,20 +1,18 @@
-import { NextFunction, Request, Response } from 'express';
 import catchAsync from '../utils/catchAsync';
-import AppError from '../utils/appError';
-import { APIFeatures } from '../utils/apiUtils';
+import AppError from '../utils/app.error';
+import { APIFeatures } from '../utils/api.utils';
 
-export const createOne = (
-  Model: any
-  // eslint-disable-next-line no-unused-vars
-): ((req: Request, res: Response, next: NextFunction) => void) =>
-  catchAsync(async (req: Request, res: Response) => {
+export const createOne = Model =>
+  catchAsync(async (req, res) => {
     const newModel = await Model.create(req.body);
 
-    res.status(201).json({ status: true, data: newModel, message: 'created successfully' });
+    res
+      .status(201)
+      .json({ status: true, data: newModel, message: 'created successfully' });
   });
 
-export const getOne = (Model: any, populate?: any) =>
-  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getOne = (Model, populate) =>
+  catchAsync(async (req, res, next) => {
     const query = Model.findById(req.params.id);
 
     if (populate) {
@@ -23,13 +21,18 @@ export const getOne = (Model: any, populate?: any) =>
 
     const existingModel = await query;
 
-    if (!existingModel) return next(new AppError('Resource does not exist', 404));
+    if (!existingModel)
+      return next(new AppError('Resource does not exist', 404));
 
-    return res.json({ status: true, data: existingModel, message: 'retrieved successfully' });
+    return res.json({
+      status: true,
+      data: existingModel,
+      message: 'retrieved successfully',
+    });
   });
 
-export const getAll = (Model: any) =>
-  catchAsync(async (req: Request, res: Response) => {
+export const getAll = Model =>
+  catchAsync(async (req, res) => {
     const features = new APIFeatures(Model.find(), req.query)
       .filter()
       .sort()
@@ -48,24 +51,35 @@ export const getAll = (Model: any) =>
     });
   });
 
-export const deleteOne = (Model: any) =>
-  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const deleteOne = Model =>
+  catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id);
 
     if (!doc) return next(new AppError('Resource does not exist', 404));
 
-    return res.status(204).json({ status: true, data: null, message: 'Deleted successfully' });
+    return res
+      .status(204)
+      .json({ status: true, data: null, message: 'Deleted successfully' });
   });
 
-export const updateOne = (Model: any) =>
-  catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const updateOne = Model =>
+  catchAsync(async (req, res, next) => {
     console.log(req.body);
-    const updatedModel = await Model.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
+    const updatedModel = await Model.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedModel)
+      return next(new AppError('Resource does not exist', 404));
+
+    return res.json({
+      status: true,
+      data: updatedModel,
+      message: 'Updated successfully',
     });
-
-    if (!updatedModel) return next(new AppError('Resource does not exist', 404));
-
-    return res.json({ status: true, data: updatedModel, message: 'Updated successfully' });
   });

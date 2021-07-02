@@ -11,23 +11,22 @@ const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
 const mongooseConnect = require('./db/mongo');
-// const errorControllers = require('./controllers/errorController');
 // const { webhookCheckout } = require('./controllers/bookingControllers');
 const config = require('./config');
 // Routes
 const authRoutes = require('./routes/v1/auth.routes');
-// const userRoutes = require('@src/routes/v1/user.routes');
-// const businessRoutes = require('@src/routes/v1/business.routes');
-// const subCategoryRoutes = require('@src/routes/v1/subCategory.routes');
-// const categoryRoutes = require('@src/routes/v1/category.routes');
-// const productRoutes = require('@src/routes/v1/product.routes');
-// const cartRoutes = require('@src/routes/v1/cart.routes');
-// const orderRoutes = require('@src/routes/v1/order.routes');
-// const couponRoutes = require('@src/routes/v1/coupon.routes');
-// const auditRoutes = require('@src/routes/v1/audit.routes');
-// const logRoutes = require('@src/routes/v1/log.routes');
-// const specs = require('./documentation/swagger.jsdoc');
-// const swaggerDocument = require('./documentation');
+// const userRoutes = require('./routes/v1/user.routes');
+// const businessRoutes = require('./routes/v1/business.routes');
+const categoryRoutes = require('./routes/v1/category.routes');
+const subCategoryRoutes = require('./routes/v1/subCategory.routes');
+// const productRoutes = require('./routes/v1/product.routes');
+// const cartRoutes = require('./routes/v1/cart.routes');
+// const orderRoutes = require('./routes/v1/order.routes');
+// const couponRoutes = require('./routes/v1/coupon.routes');
+// const auditRoutes = require('./routes/v1/audit.routes');
+// const logRoutes = require('./routes/v1/log.routes');
+// Documentation dependencies
+const swaggerDocs = require('./docs');
 
 // Initialize Server
 const app = express();
@@ -85,7 +84,7 @@ app.use(
 // app.use(express.static(path.join(__dirname, 'static')))
 app.use(express.static(path.join(__dirname, 'public'))); // This says, anytime there is a request from the
 // server, look in the public folder e.g for http://localhost:5000/overview.html, overview should be placed
-// in the root of the publis folder
+// in the root of the public folder
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 // SECURITY - Anti Cross-site Scripting - Security HTTP headers
@@ -141,14 +140,14 @@ app.use(
 app.use(compression()); //
 
 // DOCUMENTATION
-// app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 // RESOURCES ROUTES
 app.use('/api/v1/auth', authRoutes);
 // app.use('/api/v1/users', userRoutes);
 // app.use('/api/v1/businesses', businessRoutes);
-// app.use('/api/v1/subCategories', subCategoryRoutes);
-// app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/subCategories', subCategoryRoutes);
 // app.use('/api/v1/products', productRoutes);
 // app.use('/api/v1/carts', cartRoutes);
 // app.use('/api/v1/orders', orderRoutes);

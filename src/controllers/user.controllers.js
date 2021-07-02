@@ -1,10 +1,12 @@
 const _ = require('lodash');
 const User = require('../models/user.model');
-const { filterRequestBody, createAndSendTokenWithCookie } = require('../utils/apiUtils');
-const AppError = require('../utils/appError');
-const { generateToken } = require('../utils/authUtils');
-const factory = require('./handlerFactory');
-const { IAuthRequest } = require('@src/interfaces/AuthRequest');
+const {
+  filterRequestBody,
+  createAndSendTokenWithCookie,
+} = require('../utils/api.utils');
+const AppError = require('../utils/app.error');
+const { generateToken } = require('../utils/auth.utils');
+const factory = require('../factories/handler.factory');
 const Order = require('../models/order.model');
 
 export const createUser = async (req, res) => {
@@ -22,14 +24,18 @@ export const createUser = async (req, res) => {
     },
     message: 'created successfully',
   });
-});
+};
 
 export const createOrUpdate = async (req, res) => {
   console.log(req.user);
   const { name, avatar, email } = req.user;
   console.log('before');
   try {
-    const user = await User.findOneAndUpdate({ email }, { name, avatar }, { new: true });
+    const user = await User.findOneAndUpdate(
+      { email },
+      { name, avatar },
+      { new: true }
+    );
 
     console.log('after');
 
@@ -50,7 +56,7 @@ export const createOrUpdate = async (req, res) => {
   }
 };
 
-export const updateMe = async (req, res, next: NextFunction) => {
+export const updateMe = async (req, res, next) => {
   // Check that password is not being updated here
   if (req.body.password || req.body.confirmPassword) {
     return next(new AppError('You cannot update passwords', 400));
@@ -69,7 +75,11 @@ export const updateMe = async (req, res, next: NextFunction) => {
     runValidators: true,
   });
 
-  return res.json({ status: true, data: updatedUser, message: 'Updated successfully' });
+  return res.json({
+    status: true,
+    data: updatedUser,
+    message: 'Updated successfully',
+  });
 };
 
 export const deleteMe = async (req, res) => {
@@ -78,33 +88,31 @@ export const deleteMe = async (req, res) => {
   res.status(204).json({ status: true, data: null });
 };
 
-export const changePassword = 
-  async (req, res, next: NextFunction) => {
-    // Check if user exists - Find the user by id
-    const existingUser = await User.findById(req.user.id).select('+password');
-    if (!existingUser) return next(new AppError('user invalid', 400));
+export const changePassword = async (req, res, next) => {
+  // Check if user exists - Find the user by id
+  const existingUser = await User.findById(req.user.id).select('+password');
+  if (!existingUser) return next(new AppError('user invalid', 400));
 
-    // Verify current password
-    if (!(await existingUser.comparePassword(req.body.currentPassword))) {
-      return next(new AppError('Your current password is wrong', 401));
-    }
-
-    // set new password
-    existingUser.password = req.body.password;
-    existingUser.confirmPassword = req.body.confirmPassword;
-    await existingUser.save();
-    // User.findByIdAndUpdate will not work as intended if used here
-
-    // Generate token and respond to API request
-    return createAndSendTokenWithCookie(
-      existingUser,
-      200,
-      req,
-      res,
-      'Password changed successfully'
-    );
+  // Verify current password
+  if (!(await existingUser.comparePassword(req.body.currentPassword))) {
+    return next(new AppError('Your current password is wrong', 401));
   }
-);
+
+  // set new password
+  existingUser.password = req.body.password;
+  existingUser.confirmPassword = req.body.confirmPassword;
+  await existingUser.save();
+  // User.findByIdAndUpdate will not work as intended if used here
+
+  // Generate token and respond to API request
+  return createAndSendTokenWithCookie(
+    existingUser,
+    200,
+    req,
+    res,
+    'Password changed successfully'
+  );
+};
 
 // USING HANDLER FACTORY
 export const getAllUsers = factory.getAll(User);
@@ -122,7 +130,10 @@ export const getCurrentUser = async (req, res) => {
 };
 
 export const saveUserAddress = async (req, res) => {
-  await User.findOneAndUpdate({ email: req.user.email }, { address: req.body.address }).exec();
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { address: req.body.address }
+  ).exec();
 
   res.json({ ok: true });
 };
@@ -147,15 +158,18 @@ export const wishlist = async (req, res) => {
   res.json(userWishList);
 };
 
-export const removeFromWishlist = async (req, res): Promise<any> => {
+export const removeFromWishlist = async (req, res) => {
   const { productId } = req.params;
-  await User.findOneAndUpdate({ email: req.user.email }, { $pull: { wishlist: productId } }).exec();
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { $pull: { wishlist: productId } }
+  ).exec();
 
   res.json({ ok: true });
 };
 
 export const getAllOrders = async (_req, res) => {
-  const allOrders: OrderDocument[] = await Order.find({})
+  const allOrders = await Order.find({})
     .sort('-createdAt')
     .populate('products.product')
     .exec();
@@ -166,7 +180,7 @@ export const getAllOrders = async (_req, res) => {
 export const updateOrderStatus = async (req, res) => {
   const { orderId, orderStatus } = req.body;
 
-  const updated: OrderDocument | null = await Order.findByIdAndUpdate(
+  const updated = await Order.findByIdAndUpdate(
     orderId,
     { orderStatus },
     { new: true }
@@ -176,7 +190,7 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 // MIDDLEWARES
-export const getMe = async (req: IAuthRequest, next: NextFunction) => {
+export const getMe = async (req, next) => {
   req.params.id = req.user.id;
   next();
-});
+};

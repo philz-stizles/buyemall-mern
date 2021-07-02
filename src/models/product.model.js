@@ -1,25 +1,4 @@
-import { Schema, Types, model, Document } from 'mongoose';
-
-interface IUserRating {
-  star: number;
-  postedBy: Types.ObjectId;
-}
-
-export interface IProductDocument extends Document {
-  title: string;
-  slug: string;
-  description: string;
-  price: number;
-  category: Types.ObjectId;
-  subs: Types.ObjectId;
-  quantity: number;
-  sold: number;
-  images: string[];
-  shipping: string;
-  color: string;
-  brand: string;
-  ratings: IUserRating[];
-}
+const { Schema, Types, model } = require('mongoose');
 
 const productSchema = new Schema(
   {
@@ -62,11 +41,11 @@ const productSchema = new Schema(
       type: String,
       enum: ['Apple', 'Samsung', 'Microsoft', 'Lenovo', 'ASUS'],
     },
-    ratings: [{ star: Number, postedBy: { type: Types.ObjectId, ref: 'User' } }],
+    ratings: [
+      { star: Number, postedBy: { type: Types.ObjectId, ref: 'User' } },
+    ],
   },
   { timestamps: true }
 );
 
-const Product = model<IProductDocument>('Product', productSchema);
-
-export default Product;
+module.exports = model('Product', productSchema);

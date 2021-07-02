@@ -1,7 +1,7 @@
-import create from './create';
-import list from './list';
+const create = require('./create');
+const list = require('./list');
 
-export default {
+module.exports = {
   paths: {
     '/subCategories': {
       ...create,

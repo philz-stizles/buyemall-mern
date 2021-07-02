@@ -2,7 +2,7 @@ const BadRequestError = require('../../errors/bad-request');
 const NotFoundError = require('../../errors/not-found');
 const SubCategory = require('../../models/subCategory.model');
 
-exports.createSubCategory = async modelObject => {
+exports.create = async modelObject => {
   const existingSubCategory = await SubCategory.findOne({
     name: modelObject.name,
   });
@@ -27,7 +27,7 @@ exports.findBySlug = async query => {
   return targetSubCategory;
 };
 
-exports.findCategories = async (query, options = { lean: true }) => {
+exports.list = async (query, options = { lean: true }) => {
   // If you're executing a query and sending the results without modification to, say, an Express response,
   // you should use lean.In general, if you do not modify the query results and do not use custom getters,
   // you should use lean(). If you modify the query results or rely on features like getters or transforms,
@@ -35,7 +35,7 @@ exports.findCategories = async (query, options = { lean: true }) => {
   return SubCategory.find(query, {}, options);
 };
 
-exports.updateSubCategory = async (query, update, options = { new: true }) => {
+exports.update = async (query, update, options = { new: true }) => {
   const targetSubCategory = await SubCategory.findOneAndUpdate(
     query,
     update,
@@ -47,7 +47,7 @@ exports.updateSubCategory = async (query, update, options = { new: true }) => {
   return targetSubCategory;
 };
 
-exports.deleteSubCategory = async query => {
+exports.delete = async query => {
   const targetSubCategory = await SubCategory.deleteOne(query);
   if (!targetSubCategory) {
     throw new NotFoundError('SubCategory does not exist');
