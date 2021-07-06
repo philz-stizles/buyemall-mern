@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextFunction, Response } from 'express';
-import { authenticate } from '../../middlewares/auth.middlewares';
-// import catchAsync from '../../utils/catchAsync';
+const { authenticate } = require('../../src/middlewares/auth.middlewares');
 
-let mockReq: any;
-let mockRes: Response;
-let mockNext: NextFunction; //
+let mockReq;
+let mockRes;
+let mockNext; //
 
 beforeAll(() => {
   mockReq = {
@@ -14,7 +10,7 @@ beforeAll(() => {
       return null;
     },
   };
-  mockRes = {} as Response;
+  mockRes = {};
   mockNext = () => {};
 });
 

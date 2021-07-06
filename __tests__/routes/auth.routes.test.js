@@ -1,6 +1,6 @@
-import request from 'supertest';
-import app from '../../app';
-import User from '../../models/user.model';
+const request = require('supertest');
+const app = require('../../src/app');
+const User = require('../../src/models/user.model');
 
 beforeAll(() => {
   process.env.NODE_ENV = 'test';
@@ -13,12 +13,13 @@ beforeEach(async () => {
 
 describe('Auth API endpoints', () => {
   describe('Signup user @ POST /api/auth', () => {
-    describe('A valid username and password', () => {
+    describe('With valid user credentials', () => {
       const mockSignupUser = {
-        name: 'theophilus',
-        email: 'theophilus@gmail.com',
-        password: 'ighalo',
-        confirmPassword: 'ighalo',
+        fullname: 'Theophilus Ighalo',
+        email: 'theophilusighalo@gmail.com',
+        accountType: 'business',
+        password: 'password',
+        confirmPassword: 'password',
       };
 
       it('should respond with a 201 status code', async () => {

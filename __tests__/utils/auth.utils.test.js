@@ -1,5 +1,5 @@
-import { v4 as uuidV4 } from 'uuid';
-import { generateToken } from '../../utils/authUtils';
+const uuidV4 = require('uuid').v4;
+const { generateToken } = require('../../src/utils/auth.utils');
 
 describe('Authentication utilities', () => {
   describe('generateToken', () => {
