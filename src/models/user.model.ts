@@ -31,7 +31,17 @@ export interface IUserDocument extends Document {
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema(
   {
-    name: { type: String, required: [true, 'A user must have a name'], trim: true, unique: true },
+    fullname: {
+      type: String,
+      required: [true, 'A user must have a name'],
+      trim: true,
+      unique: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      unique: true,
+    },
     email: {
       type: String,
       required: [true, 'A user must have an email'],
@@ -52,7 +62,13 @@ const userSchema = new Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpiresIn: Date,
-    role: { type: String, enum: ['customer', 'business', 'admin'], default: 'customer' },
+    role: [
+      {
+        type: String,
+        enum: ['customer', 'business', 'admin'],
+        default: 'customer',
+      },
+    ],
     isActive: { type: Boolean, default: true, select: false },
     cart: { type: Array, default: [] },
     address: String,
@@ -120,11 +136,16 @@ userSchema.methods.comparePassword = async function (password: string) {
   }
 };
 
-userSchema.methods.isPasswordChangedAfterTokenGen = function (jwtTimestamp): boolean {
+userSchema.methods.isPasswordChangedAfterTokenGen = function (
+  jwtTimestamp
+): boolean {
   const user = this as IUserDocument;
   if (!user.passwordChangedAt) return false;
   const passwordChangedAtInMilliseconds = user.passwordChangedAt.getTime();
-  const passwordChangedAtInSeconds = parseInt(`${passwordChangedAtInMilliseconds / 1000}`, 10);
+  const passwordChangedAtInSeconds = parseInt(
+    `${passwordChangedAtInMilliseconds / 1000}`,
+    10
+  );
 
   return passwordChangedAtInSeconds > jwtTimestamp;
 };
@@ -132,7 +153,10 @@ userSchema.methods.isPasswordChangedAfterTokenGen = function (jwtTimestamp): boo
 userSchema.methods.createPasswordResetToken = function (): string {
   const user = this as IUserDocument;
   const resetToken = crypto.randomBytes(32).toString('hex');
-  user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  user.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
 
   user.passwordResetExpiresIn = Date.now() + 10 * 60 * 1000;
 
@@ -153,7 +177,10 @@ userSchema.methods.createPasswordResetToken = function (): string {
 //   next();
 // });
 
-userSchema.statics.findByAuthentication = async (email: string, password: string) => {
+userSchema.statics.findByAuthentication = async (
+  email: string,
+  password: string
+) => {
   // You can use arrow functions here as we will not be requiring
   // the 'this' reference
   const user = await User.findOne({ email });

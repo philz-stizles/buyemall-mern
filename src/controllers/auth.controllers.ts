@@ -13,6 +13,7 @@ import * as awsService from '@src/services/aws/ses.services';
 
 // Request body types
 type SignupBody = {
+  fullname: string;
   name: string;
   email: string;
   password: string;
@@ -31,9 +32,21 @@ type ForgotPasswordBody = { email: string };
 type ResetPasswordParams = { token: string };
 
 const signup = catchAsync(async (req: Request, res: Response) => {
-  const { name, email, password, confirmPassword } = req.body as SignupBody;
+  const { fullname, name, email, password, confirmPassword } =
+    req.body as SignupBody;
+
+  // Check if user exists
+  const existingUser = await User.findOne({ email }).exec();
+  if (existingUser) {
+    return res.status(400).json({
+      status: false,
+      data: req.body,
+      message: 'User already exists',
+    });
+  }
 
   const newUser = await User.create({
+    fullname,
     name,
     email,
     password,
@@ -42,7 +55,7 @@ const signup = catchAsync(async (req: Request, res: Response) => {
   });
   const token = generateToken({ id: newUser._id });
 
-  res.status(201).json({
+  return res.status(201).json({
     status: true,
     data: {
       user: _.omit(newUser.toJSON(), ['password']),
