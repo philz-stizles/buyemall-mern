@@ -37,6 +37,10 @@ const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 export const uploadDoc = upload.single('doc');
 
+const processUpload = multer({ dest: './uploads' });
+
+export const processUploadDoc = processUpload.single('doc');
+
 export const uploadUserPhoto = upload.single('doc');
 
 export const uploadTourPhotos = upload.fields([

@@ -5,9 +5,11 @@ import { v4 as uuidV4 } from 'uuid';
 import formidable, { Fields, Files, File } from 'formidable';
 import SubCategory from '@src/models/subCategory.model';
 import Product, { IProductDocument } from '@src/models/product.model';
+import Data, { IDataDocument } from '@src/models/data.model';
 // Services
 import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
 import * as AWS from '@src/services/aws/s3.services';
+import { parseCSVFile } from '@src/services/file/index';
 
 export const uploadWithFormCloudinary = async (
   req: Request,
@@ -77,6 +79,46 @@ export const uploadWithFormAWS = async (
   }
 };
 
+export const uploadWithMulterProcess = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  async function onNewRecord(record: any) {
+    console.log(record);
+    await Data.create(record);
+  }
+
+  function onError(error: any) {
+    console.log(error);
+  }
+
+  function done(linesRead: any) {
+    res.json({ data: linesRead });
+  }
+
+  console.log('process upload');
+  console.log('req.file', req.file);
+
+  try {
+    // Check if a file was uploaded
+    if (req.file) {
+      // const { buffer, mimetype, originalname } = req.file;
+      const { path: filePath } = req.file as any;
+      console.log('file path', filePath);
+
+      const columns = true;
+      return parseCSVFile(filePath, columns, onNewRecord, onError, done);
+    }
+
+    return res.json({
+      message: 'No file was uploaded',
+    });
+  } catch (err) {
+    console.log('File upload with Form ERR ----->', err.message);
+    return res.status(400).send('File upload with Form');
+  }
+};
+
 export const uploadWithMulterAWS = async (
   req: Request,
   res: Response
@@ -102,7 +144,7 @@ export const uploadWithMulterAWS = async (
           return res.json({
             status: true,
             data,
-            message: 'File uploaded successfully',
+            message: 'File uploaded to AWS successfully using Multer',
           });
         }
       );
