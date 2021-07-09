@@ -16,14 +16,14 @@ import { authenticate, authorize } from '@src/middlewares/auth.middlewares';
 
 const router = express.Router();
 
-router.route('/products').post(authenticate, authorize('admin'), create).get(listAll);
+router.route('/').post(authenticate, authorize('admin'), create).get(listAll);
 
 router.post('/products/filtered', list);
 
 router.get('/products/total', getProductsTotal);
 
-router.post('/products/upload', authenticate, authorize('admin'), uploadFile);
-router.post('/products/remove-file', authenticate, authorize('admin'), removeFile);
+router.post('/upload', authenticate, authorize('admin'), uploadFile);
+router.post('/remove-file', authenticate, authorize('admin'), removeFile);
 
 router
   .route('/products/:slug')

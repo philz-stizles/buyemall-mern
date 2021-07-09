@@ -1,5 +1,8 @@
 import express from 'express';
-import { signupSchema, loginSchema } from '@src/validation/yup/schemas/user.schema';
+import {
+  signupSchema,
+  loginSchema,
+} from '@src/validation/yup/schemas/user.schema';
 import {
   signup,
   signupWithEmailVerification,

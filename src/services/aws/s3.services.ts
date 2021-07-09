@@ -68,15 +68,18 @@ export const removeDoc = (
     Key: key,
   };
 
-  s3.deleteObject(params, function (error: AWSError, data: S3.DeleteObjectOutput) {
-    if (error) {
-      console.log('S3 DOCUMENT COULD NOT BE DELETED', error);
-    } else {
-      console.log('S3 DOCUMENT DELETED SUCCESSFULLY', data);
-    }
+  s3.deleteObject(
+    params,
+    function (error: AWSError, data: S3.DeleteObjectOutput) {
+      if (error) {
+        console.log('S3 DOCUMENT COULD NOT BE DELETED', error);
+      } else {
+        console.log('S3 DOCUMENT DELETED SUCCESSFULLY', data);
+      }
 
-    if (cb) {
-      cb(error, data);
+      if (cb) {
+        cb(error, data);
+      }
     }
-  });
+  );
 };

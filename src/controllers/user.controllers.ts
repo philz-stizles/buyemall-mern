@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
 import User from '../models/user.model';
-import { filterRequestBody, createAndSendTokenWithCookie } from '../utils/apiUtils';
+import {
+  filterRequestBody,
+  createAndSendTokenWithCookie,
+} from '../utils/apiUtils';
 import AppError from '../utils/appError';
 import { generateToken } from '../utils/authUtils';
 import catchAsync from '../utils/catchAsync';
@@ -26,12 +29,19 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const createOrUpdate = async (req: Request, res: Response): Promise<void> => {
+export const createOrUpdate = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   console.log(req.user);
   const { name, avatar, email } = req.user;
   console.log('before');
   try {
-    const user = await User.findOneAndUpdate({ email }, { name, avatar }, { new: true });
+    const user = await User.findOneAndUpdate(
+      { email },
+      { name, avatar },
+      { new: true }
+    );
 
     console.log('after');
 
@@ -52,27 +62,37 @@ export const createOrUpdate = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const updateMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  // Check that password is not being updated here
-  if (req.body.password || req.body.confirmPassword) {
-    return next(new AppError('You cannot update passwords', 400));
+export const updateMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Check that password is not being updated here
+    if (req.body.password || req.body.confirmPassword) {
+      return next(new AppError('You cannot update passwords', 400));
+    }
+
+    const filteredBody = filterRequestBody(req.body, 'name', 'email');
+
+    // Check if a file was uploaded
+    if (req.file) {
+      filteredBody.photo = req.file.filename;
+    }
+
+    // We use User.findByIdAndUpdate() now since we are not updating password and thus do not require validations
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      filteredBody,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    return res.json({
+      status: true,
+      data: updatedUser,
+      message: 'Updated successfully',
+    });
   }
-
-  const filteredBody = filterRequestBody(req.body, 'name', 'email');
-
-  // Check if a file was uploaded
-  if (req.file) {
-    filteredBody.photo = req.file.filename;
-  }
-
-  // We use User.findByIdAndUpdate() now since we are not updating password and thus do not require validations
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true,
-  });
-
-  return res.json({ status: true, data: updatedUser, message: 'Updated successfully' });
-});
+);
 
 export const deleteMe = catchAsync(async (req: IAuthRequest, res: Response) => {
   await User.findByIdAndUpdate(req.user._id, { isActive: false });
@@ -114,7 +134,10 @@ export const getUser = factory.getOne(User);
 export const updateUser = factory.updateOne(User);
 export const deleteUser = factory.deleteOne(User);
 
-export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+export const getCurrentUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   User.findOne({ email: req.user.email }).exec((error, existingUser) => {
     console.log(error, existingUser);
     if (error || !existingUser) throw new Error(error?.message);
@@ -123,13 +146,22 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
   });
 };
 
-export const saveUserAddress = async (req: Request, res: Response): Promise<void> => {
-  await User.findOneAndUpdate({ email: req.user.email }, { address: req.body.address }).exec();
+export const saveUserAddress = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { address: req.body.address }
+  ).exec();
 
   res.json({ ok: true });
 };
 
-export const addToWishlist = async (req: Request, res: Response): Promise<void> => {
+export const addToWishlist = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { productId } = req.body;
 
   await User.findOneAndUpdate(
@@ -149,14 +181,23 @@ export const wishlist = async (req: Request, res: Response): Promise<void> => {
   res.json(userWishList);
 };
 
-export const removeFromWishlist = async (req: Request, res: Response): Promise<any> => {
+export const removeFromWishlist = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
   const { productId } = req.params;
-  await User.findOneAndUpdate({ email: req.user.email }, { $pull: { wishlist: productId } }).exec();
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { $pull: { wishlist: productId } }
+  ).exec();
 
   res.json({ ok: true });
 };
 
-export const getAllOrders = async (_req: Request, res: Response): Promise<void> => {
+export const getAllOrders = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
   const allOrders: OrderDocument[] = await Order.find({})
     .sort('-createdAt')
     .populate('products.product')
@@ -165,7 +206,10 @@ export const getAllOrders = async (_req: Request, res: Response): Promise<void> 
   res.json(allOrders);
 };
 
-export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+export const updateOrderStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { orderId, orderStatus } = req.body;
 
   const updated: OrderDocument | null = await Order.findByIdAndUpdate(
@@ -178,7 +222,9 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
 };
 
 // MIDDLEWARES
-export const getMe = catchAsync(async (req: IAuthRequest, next: NextFunction) => {
-  req.params.id = req.user.id;
-  next();
-});
+export const getMe = catchAsync(
+  async (req: IAuthRequest, next: NextFunction) => {
+    req.params.id = req.user.id;
+    next();
+  }
+);

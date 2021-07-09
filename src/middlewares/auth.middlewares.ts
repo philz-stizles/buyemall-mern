@@ -61,7 +61,7 @@ export const authorize = (
 ): // eslint-disable-next-line no-unused-vars
 ((req: Request, res: Response, next: NextFunction) => void) =>
   catchAsync(async (req: IAuthRequest, res: Response, next: NextFunction) => {
-    if (!authorizedUsers.includes(req.user.role)) {
+    if (req.user.roles.some(role => authorizedUsers.includes(role))) {
       return next(
         new AppError(
           'You do not have the permission to perform this action',

@@ -26,6 +26,7 @@ import orderRoutes from '@src/routes/v1/order.routes';
 import couponRoutes from '@src/routes/v1/coupon.routes';
 import auditRoutes from '@src/routes/v1/audit.routes';
 import logRoutes from '@src/routes/v1/log.routes';
+import fileRoutes from '@src/routes/v1/file.routes';
 import specs from './documentation/swagger.jsdoc';
 // import swaggerDocument from './documentation';
 
@@ -163,5 +164,6 @@ app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/log', logRoutes);
+app.use('/api/v1/files', fileRoutes);
 
 export default app;

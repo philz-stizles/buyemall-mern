@@ -31,7 +31,7 @@ type ForgotPasswordBody = { email: string };
 // Request param types
 type ResetPasswordParams = { token: string };
 
-const signup = catchAsync(async (req: Request, res: Response) => {
+const signup = async (req: Request, res: Response) => {
   const { fullname, name, email, password, confirmPassword } =
     req.body as SignupBody;
 
@@ -63,7 +63,7 @@ const signup = catchAsync(async (req: Request, res: Response) => {
     },
     message: 'created successfully',
   });
-});
+};
 
 export const signupWithEmailVerification = (
   req: Request,

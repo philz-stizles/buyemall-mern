@@ -17,7 +17,7 @@ export interface IUserDocument extends Document {
   passwordChangedAt?: Date;
   passwordResetExpiresIn?: number;
   passwordResetToken: string | undefined;
-  role: string;
+  roles: string[];
   // eslint-disable-next-line no-unused-vars
   comparePassword: (candidatePassword: string) => Promise<boolean>;
   createPasswordResetToken: () => string;
@@ -62,7 +62,7 @@ const userSchema = new Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpiresIn: Date,
-    role: [
+    roles: [
       {
         type: String,
         enum: ['customer', 'business', 'admin'],
@@ -78,9 +78,6 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// Create a Model.
-const User = model<IUserDocument>('User', userSchema);
 
 // Create schema methods
 userSchema.pre('save', async function (next: HookNextFunction) {
@@ -242,4 +239,6 @@ userSchema.methods.getPublicProfile = function () {
 //   return userObject;
 // };
 
+// Create a Model.
+const User = model<IUserDocument>('User', userSchema);
 export default User;

@@ -19,24 +19,41 @@ import {
 } from '@src/controllers/user.controllers';
 import { authenticate, authorize } from '@src/middlewares/auth.middlewares';
 import { changePassword } from '@src/controllers/auth.controllers';
-import { resizeUserPhoto, uploadUserPhoto } from '@src/middlewares/multerMiddlewares';
+import {
+  resizeUserPhoto,
+  uploadUserPhoto,
+} from '@src/middlewares/multer.middlewares';
 
 const router = express.Router();
 
 router.post('/users/create-or-update', authenticate, createOrUpdate);
 
 router.get('/users/current-user', authenticate, getCurrentUser);
-router.get('/users/current-admin', authenticate, authorize('admin'), getCurrentUser);
+router.get(
+  '/users/current-admin',
+  authenticate,
+  authorize('admin'),
+  getCurrentUser
+);
 
 // Admin routes
 router.get('/admin/orders', authenticate, authorize('admin'), getAllOrders);
-router.put('/admin/order-status', authenticate, authorize('admin'), updateOrderStatus);
+router.put(
+  '/admin/order-status',
+  authenticate,
+  authorize('admin'),
+  updateOrderStatus
+);
 
 // Authenticate all routes after this middleware
 router.use(authenticate);
 
 // Manage profile
-router.route('/me').get(getMe).patch(uploadUserPhoto, resizeUserPhoto, updateMe).delete(deleteMe);
+router
+  .route('/me')
+  .get(getMe)
+  .patch(uploadUserPhoto, resizeUserPhoto, updateMe)
+  .delete(deleteMe);
 router.patch('/me/changePassword', changePassword);
 
 // Save address
