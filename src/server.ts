@@ -12,7 +12,7 @@ import path from 'path';
 import http from 'http';
 import { ApolloServer, gql } from 'apollo-server-express';
 import '../dotenv-config';
-import AppError from './utils/appError';
+import AppError from './errors/app.error';
 import app from './app';
 // GraphQL dependencies
 import resolvers from '@src/graphql/resolvers';

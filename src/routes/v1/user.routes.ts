@@ -51,7 +51,7 @@ router.use(authenticate);
 // Manage profile
 router
   .route('/me')
-  .get(getMe)
+  // .get(getMe)
   .patch(uploadUserPhoto, resizeUserPhoto, updateMe)
   .delete(deleteMe);
 router.patch('/me/changePassword', changePassword);

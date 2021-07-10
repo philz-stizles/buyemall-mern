@@ -5,7 +5,7 @@ import express from 'express';
 // File upload middlewares
 import {
   processUploadDoc,
-  uploadDoc,
+  csvUploadHandler,
 } from '@src/middlewares/multer.middlewares';
 // File upload controllers
 import {
@@ -24,10 +24,10 @@ router.post('/upload-with-body', uploadWithBody);
 
 router.post(
   '/upload-with-form-cloudinary',
-  uploadDoc,
+  csvUploadHandler,
   uploadWithFormCloudinary
 );
-router.post('/upload-with-multer-aws', uploadDoc, uploadWithMulterAWS);
+router.post('/upload-with-multer-aws', csvUploadHandler, uploadWithMulterAWS);
 router.post('/upload-with-formidable-aws', uploadWithFormidable);
 router.post(
   '/upload-with-multer-process',

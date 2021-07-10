@@ -1,5 +1,5 @@
-import Review from '@src/models/review.model';
-import * as factory from './handlerFactory';
+import Review from '@src/models/mongoose/review.model';
+import * as factory from '../factories/handler.factory';
 
 // USING HANDLER FACTORY
 export const createReview = factory.createOne(Review);

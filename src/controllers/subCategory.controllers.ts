@@ -1,13 +1,15 @@
 import { FilterQuery } from 'mongoose';
 import { Request, Response } from 'express';
 import slugify from 'slugify';
-import SubCategory from '@src/models/subCategory.model';
-import Product, { IProductDocument } from '@src/models/product.model';
+import SubCategory from '@src/models/mongoose/subCategory.model';
+import Product, { IProductDocument } from '@src/models/mongoose/product.model';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, parent } = req.body;
-    res.json(await new SubCategory({ name, parent, slug: slugify(name) }).save());
+    res.json(
+      await new SubCategory({ name, parent, slug: slugify(name) }).save()
+    );
   } catch (err) {
     console.log('Sub category CREATE ERR ----->', err);
     res.status(400).send('Create Sub category failed');
@@ -18,8 +20,12 @@ export const list = async (req: Request, res: Response): Promise<Response> =>
   res.json(await SubCategory.find({}).sort({ createdAt: -1 }).exec());
 
 export const read = async (req: Request, res: Response): Promise<void> => {
-  const subCategory = await SubCategory.findOne({ slug: req.params.slug }).exec();
-  const products = await Product.find({ subs: subCategory } as FilterQuery<IProductDocument>)
+  const subCategory = await SubCategory.findOne({
+    slug: req.params.slug,
+  }).exec();
+  const products = await Product.find({
+    subs: subCategory,
+  } as FilterQuery<IProductDocument>)
     .populate('category')
     .exec();
 
@@ -42,7 +48,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deleted = await SubCategory.findOneAndDelete({ slug: req.params.slug });
+    const deleted = await SubCategory.findOneAndDelete({
+      slug: req.params.slug,
+    });
     res.json(deleted);
   } catch (err) {
     res.status(400).send('Sub category delete failed');

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Coupon from '../models/coupon.model';
+import Coupon from '../models/mongoose/coupon.model';
 
 // create, remove, list
 

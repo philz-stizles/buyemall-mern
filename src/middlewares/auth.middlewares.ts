@@ -1,9 +1,9 @@
 import { Response, NextFunction, Request } from 'express';
 import { IAuthRequest } from '@src/interfaces/AuthRequest';
-import User from '../models/user.model';
-import AppError from '../utils/appError';
-import { verifyToken } from '../utils/authUtils';
-import catchAsync from '../utils/catchAsync';
+import User from '../models/mongoose/user.model';
+import AppError from '../errors/app.error';
+import { verifyToken } from '../utils/auth.utils';
+import catchAsync from '../utils/catchAsync.utils';
 import { IJWTokenPayload } from '@src/interfaces/JsonWebToken';
 
 export const authenticate = catchAsync(
@@ -61,7 +61,7 @@ export const authorize = (
 ): // eslint-disable-next-line no-unused-vars
 ((req: Request, res: Response, next: NextFunction) => void) =>
   catchAsync(async (req: IAuthRequest, res: Response, next: NextFunction) => {
-    if (req.user.roles.some(role => authorizedUsers.includes(role))) {
+    if (req.user.roles.some((role: string) => authorizedUsers.includes(role))) {
       return next(
         new AppError(
           'You do not have the permission to perform this action',

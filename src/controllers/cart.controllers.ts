@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import User from '@src/models/user.model';
-import Product from '@src/models/product.model';
-import Cart, { ICartProduct } from '@src/models/cart.model';
-import Coupon from '@src/models/coupon.model';
+import User from '@src/models/mongoose/user.model';
+import Product from '@src/models/mongoose/product.model';
+import Cart, { ICartProduct } from '@src/models/mongoose/cart.model';
+import Coupon from '@src/models/mongoose/coupon.model';
 
 export const addUserCart = async (
   req: Request,

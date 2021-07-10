@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import Stripe from 'stripe';
 import { Request, Response } from 'express';
-import User, { IUserDocument } from '@src/models/user.model';
-import Cart, { ICartDocument } from '@src/models/cart.model';
+import User, { IUserDocument } from '@src/models/mongoose/user.model';
+import Cart, { ICartDocument } from '@src/models/mongoose/cart.model';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2020-08-27',

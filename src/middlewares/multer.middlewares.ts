@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import path from 'path';
 import { NextFunction, Request, Response } from 'express';
@@ -23,19 +24,17 @@ import sharp from 'sharp';
 // })
 
 const multerStorage = multer.memoryStorage();
-
 const multerFilter = (req: Request, file: any, cb: any) => {
-  // console.log(file)
-  // if (file.mimetype.startsWith('image')) {
-  cb(null, true);
-  // } else {
-  //   cb(new AppError('File is not an image', 400), false);
-  // }
+  if (file.mimetype.includes('csv')) {
+    cb(null, true);
+  } else {
+    cb('Please upload only csv file.', false);
+  }
 };
-
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
-
-export const uploadDoc = upload.single('doc');
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
 
 const processUpload = multer({ dest: './uploads' });
 
@@ -68,6 +67,25 @@ export const resizeUserPhoto = (
     .toFile(`uploads/img/users/${req.file.filename}`); // https://sharp.pixelplumbing.com
 
   return next();
+};
+
+export const csvUploadHandler = () => {
+  const csvUploadStorage = multer.memoryStorage();
+
+  const csvFilter = (req: Request, file: any, cb: any) => {
+    if (file.mimetype.includes('csv')) {
+      cb(null, true);
+    } else {
+      cb('Please upload only csv file.', false);
+    }
+  };
+
+  const uploadCSV = multer({
+    storage: csvUploadStorage,
+    fileFilter: csvFilter,
+  });
+
+  return uploadCSV.single('doc');
 };
 
 // export const resizeTourPhotos = async (req, res, next) => {

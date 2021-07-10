@@ -3,13 +3,13 @@ import { FilterQuery } from 'mongoose';
 import { Request, Response } from 'express';
 import { v4 as uuidV4 } from 'uuid';
 import formidable, { Fields, Files, File } from 'formidable';
-import SubCategory from '@src/models/subCategory.model';
-import Product, { IProductDocument } from '@src/models/product.model';
-import Data, { IDataDocument } from '@src/models/data.model';
+import SubCategory from '@src/models/mongoose/subCategory.model';
+import Product, { IProductDocument } from '@src/models/mongoose/product.model';
+import Data from '@src/models/mongoose/data.model';
 // Services
 import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
 import * as AWS from '@src/services/aws/s3.services';
-import { parseCSVFile } from '@src/services/file/index';
+import { parseCSVFile } from '@src/services/file/csv-parse.services';
 
 export const uploadWithFormCloudinary = async (
   req: Request,

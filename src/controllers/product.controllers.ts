@@ -1,8 +1,8 @@
 import slugify from 'slugify';
 import { Request, Response } from 'express';
 // Models
-import Product from '@src/models/product.model';
-import User from '@src/models/user.model';
+import Product from '@src/models/mongoose/product.model';
+import User from '@src/models/mongoose/user.model';
 // Services
 import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
 

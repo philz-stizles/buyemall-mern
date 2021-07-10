@@ -81,6 +81,6 @@
   },
   "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts"],
   // "exclude": ["node_modules", "dist", "coverage"],
-  // "include": ["src/**/*"]
-  "include": ["src"]
+  "include": ["src/**/*"]
+  // "include": ["src"]
 }

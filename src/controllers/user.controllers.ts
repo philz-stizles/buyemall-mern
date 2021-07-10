@@ -1,49 +1,57 @@
 import { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
-import User from '../models/user.model';
+import User from '../models/mongoose/user.model';
 import {
   filterRequestBody,
   createAndSendTokenWithCookie,
-} from '../utils/apiUtils';
-import AppError from '../utils/appError';
-import { generateToken } from '../utils/authUtils';
-import catchAsync from '../utils/catchAsync';
-import * as factory from './handlerFactory';
+} from '../utils/api.utils';
+import AppError from '../errors/app.error';
+import { generateToken } from '../utils/auth.utils';
+import * as factory from '../factories/handler.factory';
 import { IAuthRequest } from '@src/interfaces/AuthRequest';
-import Order, { OrderDocument } from '../models/order.model';
+import Order, { OrderDocument } from '../models/mongoose/order.model';
 
-export const createUser = catchAsync(async (req: Request, res: Response) => {
+export const createUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
   const { name, email, password, confirmPassword } = req.body;
 
-  const newUser = await User.create({ name, email, password, confirmPassword });
+  try {
+    const newUser = await User.create({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
 
-  const token = generateToken(newUser);
+    const token = generateToken(newUser);
 
-  res.status(201).json({
-    status: true,
-    data: {
-      user: _.omit(newUser, 'password'), // newUser.toJSON()
-      token,
-    },
-    message: 'created successfully',
-  });
-});
+    return res.status(201).json({
+      status: true,
+      data: {
+        user: _.omit(newUser, 'password'), // newUser.toJSON()
+        token,
+      },
+      message: 'created successfully',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 export const createOrUpdate = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log(req.user);
   const { name, avatar, email } = req.user;
-  console.log('before');
   try {
     const user = await User.findOneAndUpdate(
       { email },
       { name, avatar },
       { new: true }
     );
-
-    console.log('after');
 
     if (user) {
       console.log('USER UPDATED', user);
@@ -62,71 +70,74 @@ export const createOrUpdate = async (
   }
 };
 
-export const updateMe = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // Check that password is not being updated here
-    if (req.body.password || req.body.confirmPassword) {
-      return next(new AppError('You cannot update passwords', 400));
-    }
-
-    const filteredBody = filterRequestBody(req.body, 'name', 'email');
-
-    // Check if a file was uploaded
-    if (req.file) {
-      filteredBody.photo = req.file.filename;
-    }
-
-    // We use User.findByIdAndUpdate() now since we are not updating password and thus do not require validations
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.id,
-      filteredBody,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    return res.json({
-      status: true,
-      data: updatedUser,
-      message: 'Updated successfully',
-    });
+export const updateMe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  // Check that password is not being updated here
+  if (req.body.password || req.body.confirmPassword) {
+    return next(new AppError('You cannot update passwords', 400));
   }
-);
 
-export const deleteMe = catchAsync(async (req: IAuthRequest, res: Response) => {
+  const filteredBody = filterRequestBody(req.body, 'name', 'email');
+
+  // Check if a file was uploaded
+  if (req.file) {
+    filteredBody.photo = req.file.filename;
+  }
+
+  // We use User.findByIdAndUpdate() now since we are not updating password and thus do not require validations
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  return res.json({
+    status: true,
+    data: updatedUser,
+    message: 'Updated successfully',
+  });
+};
+
+export const deleteMe = async (
+  req: IAuthRequest,
+  res: Response
+): Promise<void | Response> => {
   await User.findByIdAndUpdate(req.user._id, { isActive: false });
 
   res.status(204).json({ status: true, data: null });
-});
+};
 
-export const changePassword = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // Check if user exists - Find the user by id
-    const existingUser = await User.findById(req.user.id).select('+password');
-    if (!existingUser) return next(new AppError('user invalid', 400));
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  // Check if user exists - Find the user by id
+  const existingUser = await User.findById(req.user.id).select('+password');
+  if (!existingUser) return next(new AppError('user invalid', 400));
 
-    // Verify current password
-    if (!(await existingUser.comparePassword(req.body.currentPassword))) {
-      return next(new AppError('Your current password is wrong', 401));
-    }
-
-    // set new password
-    existingUser.password = req.body.password;
-    existingUser.confirmPassword = req.body.confirmPassword;
-    await existingUser.save();
-    // User.findByIdAndUpdate will not work as intended if used here
-
-    // Generate token and respond to API request
-    return createAndSendTokenWithCookie(
-      existingUser,
-      200,
-      req,
-      res,
-      'Password changed successfully'
-    );
+  // Verify current password
+  if (!(await existingUser.comparePassword(req.body.currentPassword))) {
+    return next(new AppError('Your current password is wrong', 401));
   }
-);
+
+  // set new password
+  existingUser.password = req.body.password;
+  existingUser.confirmPassword = req.body.confirmPassword;
+  await existingUser.save();
+  // User.findByIdAndUpdate will not work as intended if used here
+
+  // Generate token and respond to API request
+  return createAndSendTokenWithCookie(
+    existingUser,
+    200,
+    req,
+    res,
+    'Password changed successfully'
+  );
+};
 
 // USING HANDLER FACTORY
 export const getAllUsers = factory.getAll(User);
@@ -184,7 +195,7 @@ export const wishlist = async (req: Request, res: Response): Promise<void> => {
 export const removeFromWishlist = async (
   req: Request,
   res: Response
-): Promise<any> => {
+): Promise<void | Response> => {
   const { productId } = req.params;
   await User.findOneAndUpdate(
     { email: req.user.email },
@@ -222,9 +233,7 @@ export const updateOrderStatus = async (
 };
 
 // MIDDLEWARES
-export const getMe = catchAsync(
-  async (req: IAuthRequest, next: NextFunction) => {
-    req.params.id = req.user.id;
-    next();
-  }
-);
+export const getMe = async (req: Request, next: NextFunction): Promise<any> => {
+  req.params.id = req.user.id;
+  next();
+};

@@ -1,9 +1,11 @@
 import { FilterQuery } from 'mongoose';
 import { Request, Response } from 'express';
 import slugify from 'slugify';
-import Category, { ICategoryDocument } from '@src/models/category.model';
-import Product from '@src/models/product.model';
-import Sub from '@src/models/subCategory.model';
+import Category, {
+  ICategoryDocument,
+} from '@src/models/mongoose/category.model';
+import Product from '@src/models/mongoose/product.model';
+import Sub from '@src/models/mongoose/subCategory.model';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -27,7 +29,9 @@ export const read = async (req: Request, res: Response): Promise<Response> => {
     return res.status(404).json({ status: false });
   }
 
-  const products = await Product.find({ category } as FilterQuery<ICategoryDocument>)
+  const products = await Product.find({
+    category,
+  } as FilterQuery<ICategoryDocument>)
     .populate('category')
     .exec();
   // const products = await Product.find({ category }).populate('category').exec();
@@ -51,7 +55,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deletedCategory = await Category.findOneAndDelete({ slug: req.params.slug });
+    const deletedCategory = await Category.findOneAndDelete({
+      slug: req.params.slug,
+    });
     res.json(deletedCategory);
   } catch (err) {
     res.status(400).send('Create delete failed');
