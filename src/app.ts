@@ -9,11 +9,8 @@ import hpp from 'hpp';
 import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import swaggerUI from 'swagger-ui-express';
-import mongooseConnect from './db/mongo/index';
 // import errorControllers from './controllers/errorController';
 // import { webhookCheckout } from './controllers/bookingControllers';
-import config from './config';
 // Routes
 import authRoutes from '@src/routes/v1/auth.routes';
 import userRoutes from '@src/routes/v1/user.routes';
@@ -27,21 +24,12 @@ import couponRoutes from '@src/routes/v1/coupon.routes';
 import auditRoutes from '@src/routes/v1/audit.routes';
 import logRoutes from '@src/routes/v1/log.routes';
 import fileRoutes from '@src/routes/v1/file.routes';
-import specs from './documentation/swagger.jsdoc';
-// import swaggerDocument from './documentation';
 
 // Initialize Server
 const app: Express = express();
 
-//
 app.enable('trust proxy');
 
-console.log(config().dbUri);
-
-// Database
-mongooseConnect(config().dbUri);
-
-/** Rules of our API */
 // Cors
 app.use((req: Request, res: Response, next): Response | void => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -148,9 +136,6 @@ app.use((req: Request, res: Response, next) => {
   // console.log(req.cookies)
   next();
 });
-
-// DOCUMENTATION
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 // RESOURCES ROUTES
 app.use('/api/v1/auth', authRoutes);

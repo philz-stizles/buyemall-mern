@@ -11,14 +11,20 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import { ApolloServer, gql } from 'apollo-server-express';
+import swaggerUI from 'swagger-ui-express';
 import '../dotenv-config';
 import AppError from './errors/app.error';
 import app from './app';
+import mongooseConnect from './db/mongo/index';
+import config from './config';
 // GraphQL dependencies
 import resolvers from '@src/graphql/resolvers';
 import formatError from '@src/graphql/error';
 import context from '@src/graphql/context';
 // import dataSources from '@src/graphql/dataSources/mongodb';
+// Documentation dependencies
+// import specs from './documentation/swagger.jsdoc';
+import swaggerDocument from './documentation';
 
 // Configure GraphQL Apollo Server
 // If your server is deployed to an environment where NODE_ENV is set to production,
@@ -41,6 +47,9 @@ const apolloServer = new ApolloServer({
 });
 apolloServer.applyMiddleware({ app, path: '/graphql' });
 
+// DOCUMENTATION
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
 // Handle unhandled routes - routes that are not caught by our routers
 // Pass Error to the global error handler middleware
 app.all('*', (req, res, next) => {
@@ -62,6 +71,9 @@ apolloServer.installSubscriptionHandlers(httpServer); // This enables a websocke
 // to be used for graphql. You then need to add graphql-subscriptions
 
 const PORT: number = parseInt(process.env.PORT as string, 10);
+
+// Database
+mongooseConnect(config().dbUri);
 
 const server = httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on ${PORT} ${process.env.NODE_ENV}`);

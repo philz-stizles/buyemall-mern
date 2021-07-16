@@ -6,21 +6,41 @@ import Category, {
 } from '@src/models/mongoose/category.model';
 import Product from '@src/models/mongoose/product.model';
 import Sub from '@src/models/mongoose/subCategory.model';
+import AppError from '@src/errors/app.error';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name } = req.body;
-    const category = await new Category({ name, slug: slugify(name) }).save();
-    res.status(201).json(category);
+    const newCategory = await new Category({
+      name,
+      slug: slugify(name),
+    }).save();
+    res.status(201).json({
+      status: true,
+      data: newCategory,
+      message: 'Created successfully',
+    });
   } catch (err) {
-    // console.log(err);
+    console.log('CREATE CATEGORY ERR', err.message);
     res.status(400).send('Create category failed');
   }
 };
 
 export const list = async (req: Request, res: Response): Promise<void> => {
-  const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
-  res.json(categories);
+  try {
+    const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
+    res.json({
+      status: true,
+      data: categories,
+      message: 'Retrieved successful',
+    });
+  } catch (error) {
+    console.log(error.message);
+    throw new AppError(
+      'Cannot retrieve categories at the moment, try again later',
+      500
+    );
+  }
 };
 
 export const read = async (req: Request, res: Response): Promise<Response> => {

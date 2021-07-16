@@ -23,9 +23,17 @@ This is an e-commerce back end resource that enables users to signup and purchas
 - GraphQL DataSources
 - Testing and coveralls
 
-## Configure Typescript
+## Typescript
 
-- Install packages: npm install -D typescript ts-node @types/node @types/express
+- Overview:
+  - Helps us catch errors during development
+  - Only active during development
+  - Does not provide any performance optimization
+  - Neither your browser nor node JS know what typescript is
+  - Typescript compiler reads our code, checks for errors and convert it to plain js
+- Install packages:
+  - npm install -g typescript ts-node
+  - npm install -D typescript ts-node @types/node @types/express
 - Create tsconfig file: npx tsc --init
 
 ## Configure Eslint
@@ -109,6 +117,18 @@ This is an e-commerce back end resource that enables users to signup and purchas
 
 aws-sdk: npm install aws-sdk
 
+## Pre-Deployment
+
+- Ensure .gitignore with node_modules, .env(secrets) on both client and server
+- (Recommended)Implement code splitting on react client
+
+## Deployment
+
+- Heroku deploy
+  - Limitations:
+    - Database: You may need to use cloud mongo
+- Digital Ocean deploy [https://www.codecontinue.com/article/deploy-react-node-mern-full-stack-app-to-digital-ocean](Deployment Documentation)
+
 ## Security issues and best practices
 
 Compromised Database
@@ -184,8 +204,6 @@ npm install --save-dev jest
 jest --watchAll
 
 npm run test
-
-// DEPLOYMENT
 
 // CHALLENGES => TODO
 // Users can only review a tour that they have actually booked

@@ -1,13 +1,18 @@
 const basicInfo = {
   openapi: '3.0.3', // present supported openapi version
   info: {
-    title: 'Simple Todos API', // short title.
-    description: 'A simple todos API', //  desc.
-    version: '1.0.0', // version number
+    title: 'Ecommerce API',
+    version: '1.0.0',
+    description: 'An ecommerce API',
+    termsOfService: 'http://example.com/terms/',
     contact: {
-      name: 'John doe', // your name
-      email: 'john@web.com', // your email
-      url: 'web.com', // your website
+      name: 'API Support',
+      url: 'http://www.example.com/support',
+      email: 'support@devdezyn.io',
+    },
+    license: {
+      name: 'Apache 2.0',
+      url: 'https://www.apache.org/licenses/LICENSE-2.0.html',
     },
   },
 };
