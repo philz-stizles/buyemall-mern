@@ -14,7 +14,7 @@ export const uploadFile = async (file: string): Promise<void | any> => {
       public_id: `${Date.now()}`,
       resource_type: 'auto', // jpeg, png
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
     return { error };
   }
@@ -26,7 +26,7 @@ export const uploadStream = async (file: string): Promise<void | any> => {
       public_id: `${Date.now()}`,
       resource_type: 'auto', // jpeg, png
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
     return { error };
   }

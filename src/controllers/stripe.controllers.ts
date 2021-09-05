@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import Stripe from 'stripe';
 import { Request, Response } from 'express';
-import User, { IUserDocument } from '@src/models/mongoose/user.model';
-import Cart, { ICartDocument } from '@src/models/mongoose/cart.model';
+import User, { IUserDocument } from '@src/models/user.model';
+import Cart, { ICartDocument } from '@src/models/cart.model';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2020-08-27',
@@ -27,11 +27,11 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
   }
 
   let finalAmount = 0;
-  const { totalAfterDiscount, cartTotal } = cart;
+  const { totalAfterDiscount, totalAmount } = cart;
   if (isCouponApplied && totalAfterDiscount) {
     finalAmount = totalAfterDiscount * 100;
   } else {
-    finalAmount = cartTotal * 100;
+    finalAmount = totalAmount * 100;
   }
 
   // create payment intent with order amount and currency
@@ -44,7 +44,7 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
 
   return res.send({
     clientSecret: paymentIntent.client_secret,
-    cartTotal,
+    totalAmount,
     totalAfterDiscount,
     payable: finalAmount,
   });

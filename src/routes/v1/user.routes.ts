@@ -26,15 +26,10 @@ import {
 
 const router = express.Router();
 
-router.post('/users/create-or-update', authenticate, createOrUpdate);
+router.post('/create-or-update', authenticate, createOrUpdate);
 
-router.get('/users/current-user', authenticate, getCurrentUser);
-router.get(
-  '/users/current-admin',
-  authenticate,
-  authorize('admin'),
-  getCurrentUser
-);
+router.get('/current-user', authenticate, getCurrentUser);
+router.get('/current-admin', authenticate, authorize('admin'), getCurrentUser);
 
 // Admin routes
 router.get('/admin/orders', authenticate, authorize('admin'), getAllOrders);

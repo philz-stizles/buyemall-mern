@@ -7,7 +7,7 @@ export const createUser = async (
 ): Promise<IUserDocument> => {
   try {
     return await User.create(modelObject);
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error);
   }
 };

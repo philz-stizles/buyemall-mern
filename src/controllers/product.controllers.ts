@@ -1,8 +1,8 @@
 import slugify from 'slugify';
 import { Request, Response } from 'express';
 // Models
-import Product from '@src/models/mongoose/product.model';
-import User from '@src/models/mongoose/user.model';
+import Product from '@src/models/product.model';
+import User from '@src/models/user.model';
 // Services
 import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
 
@@ -12,7 +12,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     req.body.slug = slugify(req.body.title);
     const newProduct = await new Product(req.body).save();
     res.json(newProduct);
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
     // res.status(400).send("Create product failed");
     res.status(400).json({
@@ -73,7 +73,7 @@ export const remove = async (
       slug: req.params.slug,
     }).exec();
     return res.json(deleted);
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
     return res.status(400).send('Product delete failed');
   }
@@ -100,7 +100,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       }
     ).exec();
     res.json(updated);
-  } catch (err) {
+  } catch (err: any) {
     console.log('PRODUCT UPDATE ERROR ----> ', err);
     // return res.status(400).send("Product update failed");
     res.status(400).json({
@@ -122,7 +122,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 //       .exec();
 
 //     res.json(products);
-//   } catch (err) {
+//   } catch (err: any) {
 //     console.log(err);
 //   }
 // };
@@ -145,7 +145,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
       .exec();
 
     res.json(products);
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
   }
 };
@@ -254,7 +254,7 @@ const handlePrice = async (_req: Request, res: Response, price: number[]) => {
       .exec();
 
     res.json(products);
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
   }
 };
@@ -272,7 +272,7 @@ const handleCategory = async (
       .exec();
 
     res.json(products);
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
   }
 };

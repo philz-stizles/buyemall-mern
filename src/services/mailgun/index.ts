@@ -26,7 +26,7 @@ exports.sendPasswordResetMail = async (
     const response = await mg.messages.create(process.env.MAILGUN_DOMAIN, data);
     console.log('MAILGUN', response);
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('MAILGUN', error.message);
     return false;
   }

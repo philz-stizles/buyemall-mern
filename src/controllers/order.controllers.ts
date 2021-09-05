@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 // Models
-import User from '@src/models/mongoose/user.model';
-import Product from '@src/models/mongoose/product.model';
-import Cart from '@src/models/mongoose/cart.model';
-import Order from '@src/models/mongoose/order.model';
+import User from '@src/models/user.model';
+import Product from '@src/models/product.model';
+import Cart from '@src/models/cart.model';
+import Order from '@src/models/order.model';
 
 export const create = async (
   req: Request,

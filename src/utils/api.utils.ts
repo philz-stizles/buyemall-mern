@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IUserDocument } from '@src/models/mongoose/user.model';
+import { IUserDocument } from '@src/models/user.model';
 import { generateToken } from './auth.utils';
 
 class APIFeatures {
@@ -109,12 +109,14 @@ const createAndSendTokenWithCookie = (
   //     cookieOptions.secure = true
   // }
 
+  console.log(112, user);
+
   res.cookie('token', token, cookieOptions);
 
-  const retrievedUser = { ...user, password: undefined };
+  const retrievedUser = { ...user.toJSON(), password: undefined };
   res
     .status(statusCode)
-    .json({ status: true, token, data: { user: retrievedUser }, message });
+    .json({ status: true, data: { user: retrievedUser, token }, message });
 };
 
 export {

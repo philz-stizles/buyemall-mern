@@ -1,8 +1,8 @@
 import { FilterQuery } from 'mongoose';
 import { Request, Response } from 'express';
 import slugify from 'slugify';
-import SubCategory from '@src/models/mongoose/subCategory.model';
-import Product, { IProductDocument } from '@src/models/mongoose/product.model';
+import SubCategory from '@src/models/sub-category.model';
+import Product, { IProductDocument } from '@src/models/product.model';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -10,7 +10,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     res.json(
       await new SubCategory({ name, parent, slug: slugify(name) }).save()
     );
-  } catch (err) {
+  } catch (err: any) {
     console.log('Sub category CREATE ERR ----->', err);
     res.status(400).send('Create Sub category failed');
   }
@@ -41,7 +41,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       { new: true }
     );
     res.json(updated);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).send('Sub category update failed');
   }
 };
@@ -52,7 +52,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       slug: req.params.slug,
     });
     res.json(deleted);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).send('Sub category delete failed');
   }
 };

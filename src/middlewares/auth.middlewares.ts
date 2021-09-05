@@ -1,6 +1,6 @@
 import { Response, NextFunction, Request } from 'express';
 import { IAuthRequest } from '@src/interfaces/AuthRequest';
-import User from '../models/mongoose/user.model';
+import User from '../models/user.model';
 import AppError from '../errors/app.error';
 import { verifyToken } from '../utils/auth.utils';
 import catchAsync from '../utils/catchAsync.utils';
@@ -104,7 +104,7 @@ export const authenticateView = catchAsync(
         res.locals.isAuthenticated = true;
 
         return next();
-      } catch (error) {
+      } catch (error: any) {
         return next();
       }
     }

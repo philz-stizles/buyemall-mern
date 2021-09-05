@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import User from '@src/models/mongoose/user.model';
-import Product from '@src/models/mongoose/product.model';
-import Cart, { ICartProduct } from '@src/models/mongoose/cart.model';
-import Coupon from '@src/models/mongoose/coupon.model';
+import User from '@src/models/user.model';
+import Product from '@src/models/product.model';
+import Cart, { ICartProduct } from '@src/models/cart.model';
+import Coupon from '@src/models/coupon.model';
 
 export const addUserCart = async (
   req: Request,
@@ -55,15 +55,15 @@ export const addUserCart = async (
   }
 
   // Process cart total
-  let cartTotal = 0;
+  let totalAmount = 0;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < products.length; i++) {
-    cartTotal += products[i].price * products[i].count;
+    totalAmount += products[i].price * products[i].count;
   }
 
   const savedCart = await new Cart({
     products,
-    cartTotal,
+    totalAmount,
     orderedBy: existingUser._id,
   }).save();
 
@@ -90,8 +90,8 @@ export const getUserCart = async (
     return res.status(404).json({ status: false, message: 'No cart found' });
   }
 
-  const { products, cartTotal, totalAfterDiscount } = existingCart;
-  return res.json({ products, cartTotal, totalAfterDiscount });
+  const { products, totalAmount, totalAfterDiscount } = existingCart;
+  return res.json({ products, totalAmount, totalAfterDiscount });
 };
 
 export const emptyUserCart = async (
@@ -139,14 +139,14 @@ export const applyCouponToUserCart = async (
     return res.status(404).json({ status: false, message: 'No cart found' });
   }
 
-  const { cartTotal } = existingCart;
+  const { totalAmount } = existingCart;
 
-  console.log('cartTotal', cartTotal, 'discount%', validCoupon.discount);
+  console.log('totalAmount', totalAmount, 'discount%', validCoupon.discount);
 
   // calculate the total after discount
   const totalAfterDiscount = +(
-    cartTotal -
-    (cartTotal * validCoupon.discount) / 100
+    totalAmount -
+    (totalAmount * validCoupon.discount) / 100
   ).toFixed(2); // 99.99
 
   Cart.findOneAndUpdate(

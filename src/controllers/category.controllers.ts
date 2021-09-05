@@ -1,11 +1,11 @@
-import { FilterQuery } from 'mongoose';
+/* eslint-disable import/prefer-default-export */
+// /* eslint-disable @typescript-eslint/no-explicit-any */
+// import { FilterQuery } from 'mongoose';
 import { Request, Response } from 'express';
 import slugify from 'slugify';
-import Category, {
-  ICategoryDocument,
-} from '@src/models/mongoose/category.model';
-import Product from '@src/models/mongoose/product.model';
-import Sub from '@src/models/mongoose/subCategory.model';
+import Category from '@src/models/category.model';
+import Product from '@src/models/product.model';
+import Sub from '@src/models/sub-category.model';
 import AppError from '@src/errors/app.error';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
@@ -14,13 +14,14 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const newCategory = await new Category({
       name,
       slug: slugify(name),
+      createdBy: req.user._id,
     }).save();
     res.status(201).json({
       status: true,
       data: newCategory,
       message: 'Created successfully',
     });
-  } catch (err) {
+  } catch (err: any) {
     console.log('CREATE CATEGORY ERR', err.message);
     res.status(400).send('Create category failed');
   }
@@ -28,13 +29,13 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
 export const list = async (req: Request, res: Response): Promise<void> => {
   try {
-    const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
+    const categories = await Category.find({}).sort({ createdAt: -1 });
     res.json({
       status: true,
       data: categories,
       message: 'Retrieved successful',
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
     throw new AppError(
       'Cannot retrieve categories at the moment, try again later',
@@ -51,7 +52,7 @@ export const read = async (req: Request, res: Response): Promise<Response> => {
 
   const products = await Product.find({
     category,
-  } as FilterQuery<ICategoryDocument>)
+  })
     .populate('category')
     .exec();
   // const products = await Product.find({ category }).populate('category').exec();
@@ -68,7 +69,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       { new: true }
     );
     res.json(updatedCategory);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).send('Create update failed');
   }
 };
@@ -79,7 +80,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       slug: req.params.slug,
     });
     res.json(deletedCategory);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).send('Create delete failed');
   }
 };

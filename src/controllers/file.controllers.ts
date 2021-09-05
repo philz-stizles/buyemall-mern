@@ -3,9 +3,9 @@ import { FilterQuery } from 'mongoose';
 import { Request, Response } from 'express';
 import { v4 as uuidV4 } from 'uuid';
 import formidable, { Fields, Files, File } from 'formidable';
-import SubCategory from '@src/models/mongoose/subCategory.model';
-import Product, { IProductDocument } from '@src/models/mongoose/product.model';
-import Data from '@src/models/mongoose/data.model';
+import SubCategory from '@src/models/sub-category.model';
+import Product, { IProductDocument } from '@src/models/product.model';
+import Data from '@src/models/data.model';
 // Services
 import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
 import * as AWS from '@src/services/aws/s3.services';
@@ -33,7 +33,7 @@ export const uploadWithFormCloudinary = async (
     return res.json({
       message: 'No file was uploaded',
     });
-  } catch (err) {
+  } catch (err: any) {
     console.log('File upload with Form ERR ----->', err.message);
     return res.status(400).send('Create Sub category failed');
   }
@@ -73,7 +73,7 @@ export const uploadWithFormAWS = async (
     return res.json({
       message: 'No file was uploaded',
     });
-  } catch (err) {
+  } catch (err: any) {
     console.log('File upload with Form ERR ----->', err.message);
     return res.status(400).send('File upload with Form');
   }
@@ -113,7 +113,7 @@ export const uploadWithMulterProcess = async (
     return res.json({
       message: 'No file was uploaded',
     });
-  } catch (err) {
+  } catch (err: any) {
     console.log('File upload with Form ERR ----->', err.message);
     return res.status(400).send('File upload with Form');
   }
@@ -153,7 +153,7 @@ export const uploadWithMulterAWS = async (
     return res.json({
       message: 'No file was uploaded',
     });
-  } catch (err) {
+  } catch (err: any) {
     console.log('File upload with Form ERR ----->', err.message);
     return res.status(400).send('File upload with Form');
   }
@@ -201,7 +201,7 @@ export const uploadWithFormidable = (req: Request, res: Response) => {
         );
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.log('File upload with Form ERR ----->', error.message);
     return res.status(400).send('Create Sub category failed');
   }

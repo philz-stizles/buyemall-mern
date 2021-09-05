@@ -7,45 +7,19 @@
 // 6. "index" of the current directory
 // 7. "object"-imports (only available in TypeScript)
 // 8. "type" imports (only available in Flow and TypeScript)
-import fs from 'fs';
-import path from 'path';
+import { Express } from 'express';
 import http from 'http';
-import { ApolloServer, gql } from 'apollo-server-express';
 import swaggerUI from 'swagger-ui-express';
 import '../dotenv-config';
 import AppError from './errors/app.error';
 import app from './app';
-import mongooseConnect from './db/mongo/index';
+import connectDB from './db/index';
 import config from './config';
-// GraphQL dependencies
-import resolvers from '@src/graphql/resolvers';
-import formatError from '@src/graphql/error';
-import context from '@src/graphql/context';
-// import dataSources from '@src/graphql/dataSources/mongodb';
 // Documentation dependencies
 // import specs from './documentation/swagger.jsdoc';
-import swaggerDocument from './documentation';
-
-// Configure GraphQL Apollo Server
-// If your server is deployed to an environment where NODE_ENV is set to production,
-// GraphQL Playground and introspection are disabled by default. To enable them,
-// set playground: true and introspection: true
-// https://studio.apollographql.com/sandbox/explorer
-const apolloServer = new ApolloServer({
-  typeDefs: gql(
-    fs.readFileSync(path.join(__dirname, 'graphql', 'typeDefs.graphql'), {
-      encoding: 'utf8',
-    })
-  ),
-  resolvers,
-  context,
-  formatError, // Error formatting
-  // dataSources, // DataSource - MongoDB
-  introspection: true,
-  playground:
-    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
-});
-apolloServer.applyMiddleware({ app, path: '/graphql' });
+import swaggerDocument from './docs';
+import initSocketIO from './socket';
+import initGraphQL from './graphql';
 
 // DOCUMENTATION
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
@@ -64,32 +38,52 @@ app.all('*', (req, res, next) => {
 // Global error handling
 // app.use(errorControllers.handleGlobalErrors);
 
-// Configure GraphQL Subscriptions
-const httpServer = http.createServer(app); // Now we have our own http instance
-// unlike with express where the server was implicitly create for us
-apolloServer.installSubscriptionHandlers(httpServer); // This enables a websocket
-// to be used for graphql. You then need to add graphql-subscriptions
+const startUp = async (expressApp: Express) => {
+  if (!process.env.JWT_AUTH_SECRET) {
+    throw new Error('JWT_AUTH_SECRET must be defined');
+  }
 
-const PORT: number = parseInt(process.env.PORT as string, 10);
+  if (!config().dbUri) {
+    throw new Error('DATABASE_URI must be defined');
+  }
 
-// Database
-mongooseConnect(config().dbUri);
+  if (!process.env.PORT) {
+    throw new Error('PORT must be defined');
+  }
 
-const server = httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on ${PORT} ${process.env.NODE_ENV}`);
-});
+  // Connect to database
+  console.log(config().dbUri);
+  await connectDB(config().dbUri);
 
-process.on('unhandledRejection', (err?: Error) => {
-  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.log(err?.name, err?.message);
-  server.close(() => {
-    process.exit(1);
+  // initialize http server
+  const httpServer = http.createServer(expressApp); // Now we have our own http instance
+  // unlike with express where the server was implicitly create for us
+
+  // Initialize GraphQL
+  initGraphQL(expressApp, httpServer);
+
+  // Initialize Socket.io
+  initSocketIO(httpServer);
+
+  const PORT: number = parseInt(process.env.PORT as string, 10);
+  const server = httpServer.listen(PORT, () => {
+    console.log(`🚀 Server running on ${PORT} ${process.env.NODE_ENV}`);
   });
-});
 
-process.on('SIGTERM', () => {
-  console.log('SIGTERM RECEIVED. Shutting down gracefully...');
-  server.close(() => {
-    console.log('💥 Process terminated!');
+  process.on('unhandledRejection', (err?: Error) => {
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.log(err?.name, err?.message);
+    server.close(() => {
+      process.exit(1);
+    });
   });
-});
+
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM RECEIVED. Shutting down gracefully...');
+    server.close(() => {
+      console.log('💥 Process terminated!');
+    });
+  });
+};
+
+startUp(app);

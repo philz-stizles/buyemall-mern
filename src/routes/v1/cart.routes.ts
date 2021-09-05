@@ -12,12 +12,12 @@ const router = express.Router();
 router.use(authenticate);
 
 router
-  .route('/carts')
+  .route('/')
   .post(addUserCart) // save cart
   .get(getUserCart) // get cart
   .delete(emptyUserCart); // empty cart
 
 // Apply coupon
-router.post('/carts/coupon', applyCouponToUserCart);
+router.post('/coupon', applyCouponToUserCart);
 
 export default router;

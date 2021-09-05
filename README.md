@@ -1,4 +1,4 @@
-# E-COMMERCE BACKEND RESOURCES
+# BUYEMALL E-COMMERCE API
 
 ## Introduction
 
@@ -33,7 +33,7 @@ This is an e-commerce back end resource that enables users to signup and purchas
   - Typescript compiler reads our code, checks for errors and convert it to plain js
 - Install packages:
   - npm install -g typescript ts-node
-  - npm install -D typescript ts-node @types/node @types/express
+  - npm install -D typescript ts-node tsconfig-paths @types/node @types/express
 - Create tsconfig file: npx tsc --init
 
 ## Configure Eslint
@@ -103,15 +103,24 @@ This is an e-commerce back end resource that enables users to signup and purchas
 
 ## File Uploads
 
-    - multer - for parsing, validation etc
-    - formidable
-    - sharp:
-      - description: for resizing
-      - installation:
-        npm install sharp | yarn add sharp
-        [typescript] npm install @types/sharp | yarn add @types/sharp
-    - cloudinary:
-    - aws sdk
+- multer - for parsing, validation etc
+- formidable
+- sharp:
+  - description: for resizing
+  - installation:
+    npm install sharp | yarn add sharp
+    [typescript] npm install @types/sharp | yarn add @types/sharp
+- cloudinary:
+- aws sdk
+
+## Socket.io
+
+- install packages
+  npm install socket.io --save
+  npm install --save-optional bufferutil utf-8-validate
+- Definitions:
+  bufferutil: Allows to efficiently perform operations such as masking and unmasking the data payload of the WebSocket frames.
+  utf-8-validate: Allows to efficiently check if a message contains valid UTF-8 as required by the spec.
 
 ## AWS
 

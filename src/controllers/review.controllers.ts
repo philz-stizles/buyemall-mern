@@ -1,4 +1,4 @@
-import Review from '@src/models/mongoose/review.model';
+import Review from '@src/models/review.model';
 import * as factory from '../factories/handler.factory';
 
 // USING HANDLER FACTORY

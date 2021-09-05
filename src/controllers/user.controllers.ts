@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
-import User from '../models/mongoose/user.model';
+import User from '../models/user.model';
 import {
   filterRequestBody,
   createAndSendTokenWithCookie,
@@ -9,7 +10,7 @@ import AppError from '../errors/app.error';
 import { generateToken } from '../utils/auth.utils';
 import * as factory from '../factories/handler.factory';
 import { IAuthRequest } from '@src/interfaces/AuthRequest';
-import Order, { OrderDocument } from '../models/mongoose/order.model';
+import Order, { OrderDocument } from '../models/order.model';
 
 export const createUser = async (
   req: Request,
@@ -36,7 +37,7 @@ export const createUser = async (
       },
       message: 'created successfully',
     });
-  } catch (error) {
+  } catch (error: any) {
     return next(error);
   }
 };
@@ -65,7 +66,7 @@ export const createOrUpdate = async (
       console.log('USER CREATED', newUser);
       res.json(newUser);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
   }
 };

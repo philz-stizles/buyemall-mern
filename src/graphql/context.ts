@@ -1,6 +1,6 @@
 import { ExpressContext } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
-import User, { IUserDocument } from '@src/models/mongoose/user.model';
+import User, { IUserDocument } from '@src/models/user.model';
 import { IJWTokenPayload } from '@src/interfaces/JsonWebToken';
 
 export interface IContext {
@@ -34,7 +34,7 @@ const context = async ({ req }: ExpressContext): Promise<IContext> => {
       token,
       process.env.JWT_SECRET as string
     ) as IJWTokenPayload;
-  } catch (error) {
+  } catch (error: any) {
     // throw new AuthenticationError(error.message);
     return { isAuthenticated: false, user: null };
   }

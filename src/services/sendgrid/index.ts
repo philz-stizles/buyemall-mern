@@ -13,7 +13,7 @@ exports.sendEmail = async (to: string, subject: string) => {
 
   try {
     await sendGrid.send(msgOptions);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     if (error.response) {

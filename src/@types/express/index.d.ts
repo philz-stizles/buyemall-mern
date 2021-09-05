@@ -1,4 +1,4 @@
-import { IUserDocument } from '@src/models/mongoose/user.model';
+import { IUserDocument } from '@src/models/user.model';
 
 declare global {
   namespace Express {

@@ -141,7 +141,7 @@ app.use((req: Request, res: Response, next) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/businesses', businessRoutes);
-app.use('/api/v1/subCategories', subCategoryRoutes);
+app.use('/api/v1/sub-categories', subCategoryRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/carts', cartRoutes);

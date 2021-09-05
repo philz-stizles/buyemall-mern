@@ -1,4 +1,4 @@
-import Audit from '../models/mongoose/audit.model';
+import Audit from '../models/audit.model';
 import * as factory from '../factories/handler.factory';
 
 export const getFilteredAuditTrail = factory.getAll(Audit);

@@ -23,7 +23,7 @@ export const createOne =
         data: newEntity,
         message: 'created successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
       return next(error);
     }
   };
@@ -52,7 +52,7 @@ export const getOne =
         data: existingEntity,
         message: 'retrieved successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
       return next(error);
     }
   };
@@ -81,7 +81,7 @@ export const getAll =
         },
         message: 'retrieved successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
       return next(error);
     }
   };

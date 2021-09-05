@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.route('/orders').post(create).get(listByUser);
+router.route('/').post(create).get(listByUser);
 // router.route('/orders/filtered').post(filteredList);
 
 export default router;

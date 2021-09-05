@@ -6,7 +6,7 @@ import shortId from 'shortid';
 import { sendPlainEmail } from '../services/email';
 import AppError from '../errors/app.error';
 import { generateToken } from '../utils/auth.utils';
-import User, { IUserDocument } from '../models/mongoose/user.model';
+import User, { IUserDocument } from '@src/models/user.model';
 import { createAndSendTokenWithCookie } from '../utils/api.utils';
 import * as awsService from '@src/services/aws/ses.services';
 
@@ -64,56 +64,49 @@ const signup = async (req: Request, res: Response) => {
   });
 };
 
-export const signupWithEmailVerification = (
+export const signupWithEmailVerification = async (
   req: Request,
   res: Response
-): void => {
+): Promise<void | Response<any, Record<string, any>>> => {
   const { name, email, password }: SignupWithEmailVerificationBody = req.body;
 
   // Check if user exists
   // eslint-disable-next-line consistent-return
-  User.findOne({ email }).exec((findError, existingUser): any => {
-    if (findError) {
-      return res
-        .status(400)
-        .json({ status: false, data: req.body, message: findError.message });
-    }
+  const existingUser = await User.findOne({ email }).exec();
+  if (existingUser) {
+    return res.status(400).json({
+      status: false,
+      data: req.body,
+      message: 'User is already taken',
+    });
+  }
 
-    if (existingUser) {
-      return res.status(400).json({
+  // Generate token with user's name, email and password
+  const token = jwt.sign(
+    { name, email, password },
+    process.env.JWT_ACCOUNT_ACTIVATION as string,
+    {
+      expiresIn: +(process.env.JWT_ACCOUNT_ACTIVATION_EXPIRES_IN as string),
+    }
+  );
+
+  // Send email verification message
+  return awsService
+    .sendAccountActivationMail(email, token)
+    .then(data => {
+      console.log('Email submitted to SES', data);
+      res.send({
+        status: true,
+        message: `Email has been sent to ${email}. Follow the instructions to complete your registration`,
+      });
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send({
         status: false,
-        data: req.body,
-        message: 'User is already taken',
+        message: 'We could not verify your email, please try again',
       });
-    }
-
-    // Generate token with user's name, email and password
-    const token = jwt.sign(
-      { name, email, password },
-      process.env.JWT_ACCOUNT_ACTIVATION as string,
-      {
-        expiresIn: +(process.env.JWT_ACCOUNT_ACTIVATION_EXPIRES_IN as string),
-      }
-    );
-
-    // Send email verification message
-    awsService
-      .sendAccountActivationMail(email, token)
-      .then(data => {
-        console.log('Email submitted to SES', data);
-        res.send({
-          status: true,
-          message: `Email has been sent to ${email}. Follow the instructions to complete your registration`,
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        res.status(500).send({
-          status: false,
-          message: 'We could not verify your email, please try again',
-        });
-      });
-  });
+    });
 };
 
 export const signupWithEmailActivation = (req: Request, res: Response) => {
@@ -136,7 +129,7 @@ export const signupWithEmailActivation = (req: Request, res: Response) => {
 
       // Check if email already exists
       // eslint-disable-next-line consistent-return
-      User.findOne({ email }).exec((findError, existingUser) => {
+      User.findOne({ email }).exec((findError: any, existingUser) => {
         if (findError) {
           return res.status(400).json({
             status: false,
@@ -160,7 +153,7 @@ export const signupWithEmailActivation = (req: Request, res: Response) => {
           password,
           categories,
         });
-        newUser.save((createError, user) => {
+        newUser.save((createError: any, user) => {
           if (createError) {
             return res.status(400).json({
               status: false,
@@ -198,6 +191,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   // Generate token
   // const token = generateToken(existingUser);
+
+  // console.log(existingUser);
 
   return createAndSendTokenWithCookie(
     existingUser,
@@ -241,7 +236,7 @@ const forgotPassword = async (
       status: true,
       message: 'Password reset has been sent to email',
     });
-  } catch (error) {
+  } catch (error: any) {
     existingUser.passwordResetToken = undefined;
     existingUser.passwordResetExpiresIn = undefined;
     existingUser.save();
