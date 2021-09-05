@@ -4,17 +4,24 @@ import Product from '@src/models/product.model';
 import Cart, { ICartProduct } from '@src/models/cart.model';
 import Coupon from '@src/models/coupon.model';
 
-export const addUserCart = async (req: Request, res: Response): Promise<Response> => {
+export const addUserCart = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { cart: newCart } = req.body;
   const { email } = req.user;
 
   const existingUser = await User.findOne({ email }).exec();
   if (!existingUser) {
-    return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    return res
+      .status(401)
+      .json({ status: false, message: 'Unauthorized access' });
   }
 
   // If cart for current logged-in user instance exists, remove and replace with new cart
-  const existingCart = await Cart.findOne({ orderedBy: existingUser._id }).exec();
+  const existingCart = await Cart.findOne({
+    orderedBy: existingUser._id,
+  }).exec();
   if (existingCart) {
     existingCart.remove();
     console.log('removed old cart');
@@ -32,7 +39,8 @@ export const addUserCart = async (req: Request, res: Response): Promise<Response
     if (!existingProduct) {
       return res.status(400).json({
         status: false,
-        message: 'A product in your shopping cart no longer exists. Please remove and try again',
+        message:
+          'A product in your shopping cart no longer exists. Please remove and try again',
       });
     }
     const cartProduct: ICartProduct = {
@@ -47,15 +55,15 @@ export const addUserCart = async (req: Request, res: Response): Promise<Response
   }
 
   // Process cart total
-  let cartTotal = 0;
+  let totalAmount = 0;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < products.length; i++) {
-    cartTotal += products[i].price * products[i].count;
+    totalAmount += products[i].price * products[i].count;
   }
 
   const savedCart = await new Cart({
     products,
-    cartTotal,
+    totalAmount,
     orderedBy: existingUser._id,
   }).save();
 
@@ -63,10 +71,15 @@ export const addUserCart = async (req: Request, res: Response): Promise<Response
   return res.json({ ok: true });
 };
 
-export const getUserCart = async (req: Request, res: Response): Promise<Response | undefined> => {
+export const getUserCart = async (
+  req: Request,
+  res: Response
+): Promise<Response | undefined> => {
   const existingUser = await User.findOne({ email: req.user.email }).exec();
   if (!existingUser) {
-    return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    return res
+      .status(401)
+      .json({ status: false, message: 'Unauthorized access' });
   }
 
   // Get any cart ordered by retrieved user
@@ -77,22 +90,32 @@ export const getUserCart = async (req: Request, res: Response): Promise<Response
     return res.status(404).json({ status: false, message: 'No cart found' });
   }
 
-  const { products, cartTotal, totalAfterDiscount } = existingCart;
-  return res.json({ products, cartTotal, totalAfterDiscount });
+  const { products, totalAmount, totalAfterDiscount } = existingCart;
+  return res.json({ products, totalAmount, totalAfterDiscount });
 };
 
-export const emptyUserCart = async (req: Request, res: Response): Promise<Response> => {
+export const emptyUserCart = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const existingUser = await User.findOne({ email: req.user.email }).exec();
   if (!existingUser) {
-    return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    return res
+      .status(401)
+      .json({ status: false, message: 'Unauthorized access' });
   }
 
   // Delete any cart ordered by retrieved user
-  const cart = await Cart.findOneAndRemove({ orderedBy: existingUser._id }).exec();
+  const cart = await Cart.findOneAndRemove({
+    orderedBy: existingUser._id,
+  }).exec();
   return res.json(cart);
 };
 
-export const applyCouponToUserCart = async (req: Request, res: Response): Promise<Response> => {
+export const applyCouponToUserCart = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { coupon } = req.body;
 
   // Validate coupon
@@ -104,7 +127,9 @@ export const applyCouponToUserCart = async (req: Request, res: Response): Promis
   // Get user to retrieve user._id from DB, firebase auth middlware may not have your db _id
   const existingUser = await User.findOne({ email: req.user.email }).exec();
   if (!existingUser) {
-    return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    return res
+      .status(401)
+      .json({ status: false, message: 'Unauthorized access' });
   }
 
   const existingCart = await Cart.findOne({ orderedBy: existingUser._id })
@@ -114,14 +139,21 @@ export const applyCouponToUserCart = async (req: Request, res: Response): Promis
     return res.status(404).json({ status: false, message: 'No cart found' });
   }
 
-  const { cartTotal } = existingCart;
+  const { totalAmount } = existingCart;
 
-  console.log('cartTotal', cartTotal, 'discount%', validCoupon.discount);
+  console.log('totalAmount', totalAmount, 'discount%', validCoupon.discount);
 
   // calculate the total after discount
-  const totalAfterDiscount = +(cartTotal - (cartTotal * validCoupon.discount) / 100).toFixed(2); // 99.99
+  const totalAfterDiscount = +(
+    totalAmount -
+    (totalAmount * validCoupon.discount) / 100
+  ).toFixed(2); // 99.99
 
-  Cart.findOneAndUpdate({ orderedBy: existingUser._id }, { totalAfterDiscount }, { new: true });
+  Cart.findOneAndUpdate(
+    { orderedBy: existingUser._id },
+    { totalAfterDiscount },
+    { new: true }
+  );
 
   return res.json(totalAfterDiscount);
 };

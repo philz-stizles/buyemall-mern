@@ -3,7 +3,7 @@ type Query {
   categories: QueryResponse
 }
 
-interface QueryResponse {
+type QueryResponse {
   code: String!
   success: Boolean!
   message: String!
@@ -15,7 +15,7 @@ type Mutation {
   login(credentials: LoginInput): MutationResponse
 }
 
-interface MutationResponse {
+type MutationResponse {
   code: String!
   success: Boolean!
   message: String!

@@ -5,15 +5,22 @@ import Product from '@src/models/product.model';
 import Cart from '@src/models/cart.model';
 import Order from '@src/models/order.model';
 
-export const create = async (req: Request, res: Response): Promise<Response> => {
+export const create = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { paymentIntent } = req.body.stripeResponse;
 
   const existingUser = await User.findOne({ email: req.user.email }).exec();
   if (!existingUser) {
-    return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    return res
+      .status(401)
+      .json({ status: false, message: 'Unauthorized access' });
   }
 
-  const existingCart = await Cart.findOne({ orderedBy: existingUser._id }).exec();
+  const existingCart = await Cart.findOne({
+    orderedBy: existingUser._id,
+  }).exec();
   if (!existingCart) {
     return res.status(404).json({ status: false, message: 'No cart found' });
   }
@@ -43,10 +50,15 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
   return res.status(201).json({ ok: true });
 };
 
-export const listByUser = async (req: Request, res: Response): Promise<Response> => {
+export const listByUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const existingUser = await User.findOne({ email: req.user.email }).exec();
   if (!existingUser) {
-    return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    return res
+      .status(401)
+      .json({ status: false, message: 'Unauthorized access' });
   }
 
   const orders = await Order.find({ orderedBy: existingUser._id })

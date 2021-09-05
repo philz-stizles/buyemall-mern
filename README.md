@@ -1,4 +1,4 @@
-# E-COMMERCE BACKEND RESOURCES
+# BUYEMALL E-COMMERCE API
 
 ## Introduction
 
@@ -7,9 +7,10 @@ This is an e-commerce back end resource that enables users to signup and purchas
 ## Technologies
 
 - Node, Express,
-- Typescript, Eslint
-- Jest, Istanbul
-- AWS SES, S3, EC2
+- REST, GraphQL, Sockets
+- Typescript, Eslint, Prettier
+- Jest, Istanbul, Supertest
+- AWS SES, S3, EC2, Serverless
 - Cloudinary
 - MongoDB, Redis
 - Docker
@@ -19,11 +20,20 @@ This is an e-commerce back end resource that enables users to signup and purchas
 - Multitenancy
 - Authentication, Authorization
 - Crone jobs, and schedulers
+- GraphQL DataSources
 - Testing and coveralls
 
-## Configure Typescript
+## Typescript
 
-- Install packages: npm install -D typescript ts-node @types/node @types/express
+- Overview:
+  - Helps us catch errors during development
+  - Only active during development
+  - Does not provide any performance optimization
+  - Neither your browser nor node JS know what typescript is
+  - Typescript compiler reads our code, checks for errors and convert it to plain js
+- Install packages:
+  - npm install -g typescript ts-node
+  - npm install -D typescript ts-node tsconfig-paths @types/node @types/express
 - Create tsconfig file: npx tsc --init
 
 ## Configure Eslint
@@ -71,7 +81,7 @@ This is an e-commerce back end resource that enables users to signup and purchas
 
 ## Jest
 
-- Install dependencies: npm install -D jest ts-jest @types/jest
+- Install dependencies: npm install -D jest ts-jest @types/jest supertest
 - Configure eslint: npx ts-jest config:init
 - Add your configs to 'jest.config.js'
 - Configure '.eslintrc.js':
@@ -90,6 +100,73 @@ This is an e-commerce back end resource that enables users to signup and purchas
   npm i dotenv-safe
   npm i --save-dev @types/dotenv-safe
 - Create files '.env.example' and '.env'
+
+## File Uploads
+
+- multer - for parsing, validation etc
+- formidable
+- sharp:
+  - description: for resizing
+  - installation:
+    npm install sharp | yarn add sharp
+    [typescript] npm install @types/sharp | yarn add @types/sharp
+- cloudinary:
+- aws sdk
+
+## Socket.io
+
+- install packages
+  npm install socket.io --save
+  npm install --save-optional bufferutil utf-8-validate
+- Definitions:
+  bufferutil: Allows to efficiently perform operations such as masking and unmasking the data payload of the WebSocket frames.
+  utf-8-validate: Allows to efficiently check if a message contains valid UTF-8 as required by the spec.
+
+## AWS
+
+aws-sdk: npm install aws-sdk
+
+## Pre-Deployment
+
+- Ensure .gitignore with node_modules, .env(secrets) on both client and server
+- (Recommended)Implement code splitting on react client
+
+## Deployment
+
+- Heroku deploy
+  - Limitations:
+    - Database: You may need to use cloud mongo
+- Digital Ocean deploy [https://www.codecontinue.com/article/deploy-react-node-mern-full-stack-app-to-digital-ocean](Deployment Documentation)
+
+## Security issues and best practices
+
+Compromised Database
+
+    - Strongly encrypt passwords with salt and hash (bcrypt)
+    - Strongly encrypt password reset tokens (SHA 256)
+
+Brute Force Attacks
+
+    - Use bcrypt to make login requests slow
+    - Implement rate limiting(npm install express-rate-limit) which limits the no of requests from on single IP
+    - Implement max login attempts
+
+Cross-site Scripting Attacks
+
+    - Store JWT in HTTPOnly cookies
+    - Sanitize user input data
+    - Set special HTTP headers(helmet)
+
+Cross-site Scripting Attacks - This attack allows the attacker to read the localStorage which is the reason we should never store token in localstorage
+
+    - Store JWT in HTTPOnly cookies
+    - Sanitize user input data
+    - Set special HTTP headers(helmet)
+
+Sanitization
+
+    - xss-clean
+    - express-mongo-sanitize
 
 npm i --save-dev @types/morgan @types/hpp
 
@@ -118,37 +195,6 @@ nodemailer
 // Put as much business logic in the models to keep the controllers as simple and lean as possible, so that controllers can focus on handling requests and interacting with models and send responses
 
 // Configure Eslint & Prettier: npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-config-airbnb eslint-plugin-node eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-markdown
-//
-//
-//
-// SECURITY ISSUES AND BEST PRACTISES
-// Compromised Database
-// - Strongly encrypt passwords with salt and hash (bcrypt)
-// - Strongly encrypt password reset tokens (SHA 256)
-//
-// Brute Force Attacks
-// - Use bcrypt to make login requests slow
-// - Implement rate limiting(npm install express-rate-limit) which limits the no of requests from on single IP
-// - Implement max login attampts
-//
-// Cross-site Scripting Attacks
-// - Store JWT in HTTPOnly cookies
-// - SAanitize user input data
-// - Set special HTTP headers(helmet)
-//
-// Cross-site Scripting Attacks - This attack allows the attacker to read the localStorage which is the reason we should never store token in localstorage
-// - Store JWT in HTTPOnly cookies
-// - SAanitize user input data
-// - Set special HTTP headers(helmet)
-//
-// Sanitization
-// - xss-clean
-// - express-mongo-sanitize
-
-// FILE UPLOADS
-
-- multer - for parsing, validation etc
-- sharp - for resizing
 
 DATA MODELLING
 This is the process of converting unstructured data from real-world scenarios into structured, logical data models
@@ -168,7 +214,9 @@ jest --watchAll
 
 npm run test
 
-// DEPLOYMENT
-
 // CHALLENGES => TODO
 // Users can only review a tour that they have actually booked
+
+mongoose@5.11.16
+node@14.15.5
+typescript@4.1.5

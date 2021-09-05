@@ -1,7 +1,7 @@
 import mongoose, { Connection } from 'mongoose';
 
-const mongooseConnect = (dbUri: string): void => {
-  mongoose.connect(dbUri, {
+const mongooseConnect = async (dbUri: string): Promise<void> => {
+  await mongoose.connect(dbUri, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,

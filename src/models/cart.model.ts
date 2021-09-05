@@ -1,4 +1,5 @@
-import { Schema, Types, model, Document } from 'mongoose';
+import { Schema, Types, model, Document, PopulatedDoc } from 'mongoose';
+import { IUserDocument } from '@src/models//user.model';
 
 export interface ICartProduct {
   product: { _id: Types.ObjectId };
@@ -7,14 +8,16 @@ export interface ICartProduct {
   price: number;
 }
 
-export interface ICartDocument extends Document {
+export interface ICartDocument {
   products: ICartProduct[];
-  cartTotal: number;
+  totalAmount: number;
   totalAfterDiscount: number;
-  orderedBy: Types.ObjectId;
+  createdBy: PopulatedDoc<IUserDocument & Document>;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const cartSchema = new Schema(
+const schema = new Schema<ICartDocument>(
   {
     products: [
       {
@@ -24,12 +27,12 @@ const cartSchema = new Schema(
         price: Number,
       },
     ],
-    cartTotal: Number,
+    totalAmount: { type: Number, required: true },
     totalAfterDiscount: Number,
-    orderedBy: { type: Types.ObjectId, ref: 'User' },
+    createdBy: { type: Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );
 
-const Cart = model<ICartDocument>('Cart', cartSchema);
+const Cart = model<ICartDocument>('Cart', schema);
 export default Cart;

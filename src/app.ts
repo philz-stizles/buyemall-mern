@@ -1,5 +1,4 @@
 import path from 'path';
-import fs from 'fs';
 import express, { Express, Request, Response } from 'express';
 import expressRateLimit from 'express-rate-limit';
 import helmet from 'helmet';
@@ -10,12 +9,8 @@ import hpp from 'hpp';
 import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import { ApolloServer, gql } from 'apollo-server-express';
-import mongooseConnect from './db/index';
-import AppError from './utils/appError';
 // import errorControllers from './controllers/errorController';
 // import { webhookCheckout } from './controllers/bookingControllers';
-import config from './config';
 // Routes
 import authRoutes from '@src/routes/v1/auth.routes';
 import userRoutes from '@src/routes/v1/user.routes';
@@ -28,44 +23,51 @@ import orderRoutes from '@src/routes/v1/order.routes';
 import couponRoutes from '@src/routes/v1/coupon.routes';
 import auditRoutes from '@src/routes/v1/audit.routes';
 import logRoutes from '@src/routes/v1/log.routes';
-// GraphQL dependencies
-import resolvers from '@src/graphql/resolvers';
-import formatError from '@src/graphql/error';
-import context from '@src/graphql/context';
-import dataSources from '@src/graphql/dataSources/mongodb';
+import fileRoutes from '@src/routes/v1/file.routes';
 
 // Initialize Server
 const app: Express = express();
 
-//
 app.enable('trust proxy');
 
-// Database
-mongooseConnect(config().dbUri);
-
-/** Rules of our API */
-app.use((req, res, next): unknown => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+// Cors
+app.use((req: Request, res: Response, next): Response | void => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
   );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+  // A fix for graphql response with status of 405 (Method Not Allowed)
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-    // return res.status(200).json({});
     return res.sendStatus(200);
   }
-
   return next();
 });
+// app.use((req, res, next): unknown => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+//   );
+//   res.header('Access-Control-Allow-Credentials', true);
+
+//   if (req.method === 'OPTIONS') {
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+//     // return res.status(200).json({});
+//     return res.sendStatus(200);
+//   }
+
+//   return next();
+// });
 
 // CORS
 app.use(
-  cors({
-    // origin: 'https://someurl.com'
-  })
-); // cors() is a middleware which means that you can implement on specific routes as middlware
+  cors()
+  // origin: 'https://someurl.com'
+); // cors() is a middleware which means that you can implement on specific routes as middleware
 
 // app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors()) // You can also use for specific routes
@@ -139,7 +141,7 @@ app.use((req: Request, res: Response, next) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/businesses', businessRoutes);
-app.use('/api/v1/subCategories', subCategoryRoutes);
+app.use('/api/v1/sub-categories', subCategoryRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/carts', cartRoutes);
@@ -147,32 +149,6 @@ app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/log', logRoutes);
-
-// Configure GraphQL Apollo Server
-// If your server is deployed to an environment where NODE_ENV is set to production,
-// GraphQL Playground and introspection are disabled by default. To enable them,
-// set playground: true and introspection: true
-// https://studio.apollographql.com/sandbox/explorer
-export const apolloServer = new ApolloServer({
-  typeDefs: gql(
-    fs.readFileSync(path.join(__dirname, 'graphql', 'typeDefs.graphql'), { encoding: 'utf8' })
-  ),
-  resolvers,
-  context,
-  formatError, // Error formatting
-  dataSources, // DataSource - MongoDB
-});
-apolloServer.applyMiddleware({ app, path: '/graphql' });
-
-// Handle unhandled routes - routes that are not caught by our routers
-// Pass Error to the global error handler middleware
-app.all('*', (req, res, next) => {
-  const error = new AppError(`Can't find ${req.originalUrl} on this server`, 404);
-
-  next(error);
-});
-
-// Global error handling
-// app.use(errorControllers.handleGlobalErrors);
+app.use('/api/v1/files', fileRoutes);
 
 export default app;

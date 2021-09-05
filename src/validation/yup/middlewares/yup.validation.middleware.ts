@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AnySchema } from 'yup';
 import { Request, Response, NextFunction } from 'express';
 import logger from '@src/loggers/logger';
@@ -13,7 +14,7 @@ const validationRequest =
       });
 
       return next();
-    } catch (e) {
+    } catch (e: any) {
       logger.error('YUP VALIDATION MIDDLEWARE', e.message, e);
       return res.status(400).send(e.errors);
     }

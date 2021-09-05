@@ -1,5 +1,6 @@
-import { Schema, Types, model, Document } from 'mongoose';
-import Product from './product.model';
+import { Schema, Types, model, Document, PopulatedDoc } from 'mongoose';
+import Product, { IProductDocument } from '@src/models/product.model';
+import { IUserDocument } from '@src/models/user.model';
 
 // Put as much business logic in the models to keep the controllers as simple
 // and lean as possible
@@ -7,8 +8,10 @@ import Product from './product.model';
 export interface IReviewDocument extends Document {
   review: string;
   rating: number;
-  product: Types.ObjectId;
-  creator: Types.ObjectId;
+  product: PopulatedDoc<IProductDocument & Document>;
+  createdBy: PopulatedDoc<IUserDocument & Document>;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const reviewSchema = new Schema(
@@ -17,13 +20,13 @@ const reviewSchema = new Schema(
     rating: { type: Number, min: 1, max: 5 },
     product: {
       type: Types.ObjectId,
-      ref: 'Tours',
+      ref: 'Product',
       required: [true, 'Review must have a tour'],
     },
-    creator: {
+    createdBy: {
       type: Types.ObjectId,
-      ref: 'Users',
-      required: [true, 'Review must have a creator'],
+      ref: 'User',
+      required: [true, 'Review must have a createdBy'],
     },
   },
   {
@@ -34,19 +37,19 @@ const reviewSchema = new Schema(
   }
 );
 
-reviewSchema.index({ tour: 1, creator: 1 }, { unique: true }); // Every review must
-// have a unique combination tour and creator, thus preventing dublicate reviews -
+reviewSchema.index({ tour: 1, createdBy: 1 }, { unique: true }); // Every review must
+// have a unique combination tour and createdBy, thus preventing dublicate reviews -
 // multiple reviews from same user
 
 reviewSchema.pre(/^find/, function (next) {
   // this
   //     .populate({ path: 'tour', select: 'name -_id' }) // First query
-  //     .populate({ path: 'creator', select: 'name photo -_id' }); // Second query // Rather than duplicating the populate query
+  //     .populate({ path: 'createdBy', select: 'name photo -_id' }); // Second query // Rather than duplicating the populate query
   // // for every static method you use to retrieve the Model data, define it as a pre method and it will apply
   // // for all find queries - findById, findOne etc
 
   // It might not be necessary to display Tour, depending on your business model
-  this.populate({ path: 'creator', select: 'name photo -_id' });
+  this.populate({ path: 'createdBy', select: 'name photo -_id' });
 
   next();
 });

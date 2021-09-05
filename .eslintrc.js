@@ -21,12 +21,18 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'prettier', 'import'],
   rules: {
-    'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    'prettier/prettier': ['error', { endOfLine: 'auto', singleQuote: true }],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: 'req|res|next|val' },
+    ],
     'import/extensions': 'off',
     'import/no-unresolved': 'error',
+    // note you must disable the base rule as it can report incorrect errors
+    'no-unused-vars': ['error', { argsIgnorePattern: 'req|res|next|val' }],
     'no-console': 'off',
     'func-names': 'off',
-    'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'no-underscore-dangle': ['error', { allow: ['_id', '_next'] }],
     'prefer-destructuring': ['error', { object: true, array: false }],
     'import/order': [
       'error',

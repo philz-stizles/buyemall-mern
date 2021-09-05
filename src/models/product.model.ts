@@ -1,27 +1,36 @@
-import { Schema, Types, model, Document } from 'mongoose';
+import { Schema, Types, model, Document, PopulatedDoc } from 'mongoose';
+import { ICategoryDocument } from './category.model';
+import { IUserDocument } from '@src/models/user.model';
+
+interface IFileUpload {
+  id: string;
+  url: string;
+}
 
 interface IUserRating {
   star: number;
-  postedBy: Types.ObjectId;
+  postedBy: PopulatedDoc<IUserDocument & Document>;
 }
 
-export interface IProductDocument extends Document {
+export interface IProductDocument {
   title: string;
   slug: string;
   description: string;
   price: number;
-  category: Types.ObjectId;
+  category: PopulatedDoc<ICategoryDocument & Document>;
   subs: Types.ObjectId;
   quantity: number;
   sold: number;
-  images: string[];
+  images: IFileUpload[];
   shipping: string;
   color: string;
   brand: string;
   ratings: IUserRating[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-const productSchema = new Schema(
+const productSchema = new Schema<IProductDocument>(
   {
     title: {
       type: String,
@@ -33,6 +42,7 @@ const productSchema = new Schema(
     slug: {
       type: String,
       unique: true,
+      required: true,
       lowercase: true,
       index: true,
     },
@@ -52,7 +62,7 @@ const productSchema = new Schema(
     subs: [{ type: Types.ObjectId, ref: 'SubCategory' }],
     quantity: Number,
     sold: { type: Number, default: 0 },
-    images: { type: Array },
+    images: [{ id: String, url: String }],
     shipping: { type: String, enum: ['Yes', 'No'] },
     color: {
       type: String,
@@ -62,11 +72,11 @@ const productSchema = new Schema(
       type: String,
       enum: ['Apple', 'Samsung', 'Microsoft', 'Lenovo', 'ASUS'],
     },
-    ratings: [{ star: Number, postedBy: { type: Types.ObjectId, ref: 'User' } }],
+    ratings: [
+      { star: Number, postedBy: { type: Types.ObjectId, ref: 'User' } },
+    ],
   },
   { timestamps: true }
 );
 
-const Product = model<IProductDocument>('Product', productSchema);
-
-export default Product;
+export default model<IProductDocument>('Product', productSchema);

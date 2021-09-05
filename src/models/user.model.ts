@@ -1,7 +1,9 @@
-import { Schema, model, Document, Types, HookNextFunction } from 'mongoose';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Schema, model, Types, Document, PopulatedDoc } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { IRoleDocument } from '@src/models/role.model';
 
 interface IUserToken {
   token: string;
@@ -9,6 +11,8 @@ interface IUserToken {
 
 // Create an interface representing a document in MongoDB.
 export interface IUserDocument extends Document {
+  fullname: string;
+  username: string;
   name: string;
   email: string;
   avatar?: string;
@@ -17,7 +21,7 @@ export interface IUserDocument extends Document {
   passwordChangedAt?: Date;
   passwordResetExpiresIn?: number;
   passwordResetToken: string | undefined;
-  role: string;
+  roles: PopulatedDoc<IRoleDocument & Document>[];
   // eslint-disable-next-line no-unused-vars
   comparePassword: (candidatePassword: string) => Promise<boolean>;
   createPasswordResetToken: () => string;
@@ -25,13 +29,29 @@ export interface IUserDocument extends Document {
   isPasswordChangedAfterTokenGen: (issuedAt: number) => boolean;
   isActive: boolean;
   tokens: IUserToken[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Put as much business logic in the models to keep the controllers as simple and lean as possible
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema(
   {
-    name: { type: String, required: [true, 'A user must have a name'], trim: true, unique: true },
+    fullname: {
+      type: String,
+      required: [true, 'A user must have a fullname'],
+      trim: true,
+    },
+    username: {
+      type: String,
+      trim: true,
+      unique: true,
+      index: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+    },
     email: {
       type: String,
       required: [true, 'A user must have an email'],
@@ -52,22 +72,19 @@ const userSchema = new Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpiresIn: Date,
-    role: { type: String, enum: ['customer', 'business', 'admin'], default: 'customer' },
+    roles: [{ type: Types.ObjectId, ref: 'Role' }],
     isActive: { type: Boolean, default: true, select: false },
-    cart: { type: Array, default: [] },
+
     address: String,
     picture: String,
-    wishlist: [{ type: Types.ObjectId, ref: 'Product' }],
+
     tokens: [{ token: { type: String, required: true } }],
   },
   { timestamps: true }
 );
 
-// Create a Model.
-const User = model<IUserDocument>('User', userSchema);
-
 // Create schema methods
-userSchema.pre('save', async function (next: HookNextFunction) {
+userSchema.pre('save', async function (next: any) {
   const user = this as IUserDocument;
   // If password was not modified, do not encrypt
   if (!user.isModified('password')) return next();
@@ -83,7 +100,7 @@ userSchema.pre('save', async function (next: HookNextFunction) {
     user.confirmPassword = undefined;
 
     return next();
-  } catch (error) {
+  } catch (error: any) {
     return next(error);
   }
 });
@@ -114,17 +131,23 @@ userSchema.methods.comparePassword = async function (password: string) {
   try {
     const isMatch = await bcrypt.compare(password, user.password as string);
     return isMatch;
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.log(error.message);
     return false;
   }
 };
 
-userSchema.methods.isPasswordChangedAfterTokenGen = function (jwtTimestamp): boolean {
+userSchema.methods.isPasswordChangedAfterTokenGen = function (
+  jwtTimestamp
+): boolean {
   const user = this as IUserDocument;
   if (!user.passwordChangedAt) return false;
   const passwordChangedAtInMilliseconds = user.passwordChangedAt.getTime();
-  const passwordChangedAtInSeconds = parseInt(`${passwordChangedAtInMilliseconds / 1000}`, 10);
+  const passwordChangedAtInSeconds = parseInt(
+    `${passwordChangedAtInMilliseconds / 1000}`,
+    10
+  );
 
   return passwordChangedAtInSeconds > jwtTimestamp;
 };
@@ -132,7 +155,10 @@ userSchema.methods.isPasswordChangedAfterTokenGen = function (jwtTimestamp): boo
 userSchema.methods.createPasswordResetToken = function (): string {
   const user = this as IUserDocument;
   const resetToken = crypto.randomBytes(32).toString('hex');
-  user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  user.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
 
   user.passwordResetExpiresIn = Date.now() + 10 * 60 * 1000;
 
@@ -153,9 +179,13 @@ userSchema.methods.createPasswordResetToken = function (): string {
 //   next();
 // });
 
-userSchema.statics.findByAuthentication = async (email: string, password: string) => {
+userSchema.statics.findByAuthentication = async (
+  email: string,
+  password: string
+) => {
   // You can use arrow functions here as we will not be requiring
   // the 'this' reference
+  // eslint-disable-next-line no-use-before-define
   const user = await User.findOne({ email });
   if (!user) {
     throw new Error('Invalid Credentials');
@@ -215,4 +245,6 @@ userSchema.methods.getPublicProfile = function () {
 //   return userObject;
 // };
 
+// Create a Model.
+const User = model<IUserDocument>('User', userSchema);
 export default User;

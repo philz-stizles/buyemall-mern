@@ -1,13 +1,13 @@
 import { DocumentDefinition, FilterQuery, LeanDocument } from 'mongoose';
 import { omit } from 'lodash';
-import User, { IUserDocument } from '@src/models/user.model';
+import User, { IUserDocument } from '@src/models/mongoose/user.model';
 
 export const createUser = async (
   modelObject: DocumentDefinition<IUserDocument>
 ): Promise<IUserDocument> => {
   try {
     return await User.create(modelObject);
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error);
   }
 };

@@ -1,4 +1,5 @@
-import { Schema, Types, model, Document } from 'mongoose';
+import { Schema, Types, model, Document, PopulatedDoc } from 'mongoose';
+import { IUserDocument } from '@src/models//user.model';
 
 interface IOrderProduct {
   product: Types.ObjectId;
@@ -6,15 +7,17 @@ interface IOrderProduct {
   color: string;
 }
 
-export type OrderDocument = Document & {
+export interface OrderDocument extends Document {
   products: IOrderProduct[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   paymentIntent: any;
   status: string;
-  orderedBy: Types.ObjectId;
-};
+  createdBy: PopulatedDoc<IUserDocument & Document>;
+  createdAt: string;
+  updatedAt: string;
+}
 
-const orderSchema = new Schema<OrderDocument>(
+const orderSchema = new Schema(
   {
     products: [
       {
@@ -27,9 +30,15 @@ const orderSchema = new Schema<OrderDocument>(
     status: {
       type: String,
       default: 'Not Processed',
-      enum: ['Not Processed', 'processing', 'Dispatched', 'Cancelled', 'Completed'],
+      enum: [
+        'Not Processed',
+        'processing',
+        'Dispatched',
+        'Cancelled',
+        'Completed',
+      ],
     },
-    orderedBy: { type: Types.ObjectId, ref: 'User' },
+    createdBy: { type: Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );

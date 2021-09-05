@@ -1,39 +1,58 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
 import User from '../models/user.model';
-import { filterRequestBody, createAndSendTokenWithCookie } from '../utils/apiUtils';
-import AppError from '../utils/appError';
-import { generateToken } from '../utils/authUtils';
-import catchAsync from '../utils/catchAsync';
-import * as factory from './handlerFactory';
+import {
+  filterRequestBody,
+  createAndSendTokenWithCookie,
+} from '../utils/api.utils';
+import AppError from '../errors/app.error';
+import { generateToken } from '../utils/auth.utils';
+import * as factory from '../factories/handler.factory';
 import { IAuthRequest } from '@src/interfaces/AuthRequest';
 import Order, { OrderDocument } from '../models/order.model';
 
-export const createUser = catchAsync(async (req: Request, res: Response) => {
+export const createUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
   const { name, email, password, confirmPassword } = req.body;
 
-  const newUser = await User.create({ name, email, password, confirmPassword });
-
-  const token = generateToken(newUser);
-
-  res.status(201).json({
-    status: true,
-    data: {
-      user: _.omit(newUser, 'password'), // newUser.toJSON()
-      token,
-    },
-    message: 'created successfully',
-  });
-});
-
-export const createOrUpdate = async (req: Request, res: Response): Promise<void> => {
-  console.log(req.user);
-  const { name, avatar, email } = req.user;
-  console.log('before');
   try {
-    const user = await User.findOneAndUpdate({ email }, { name, avatar }, { new: true });
+    const newUser = await User.create({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
 
-    console.log('after');
+    const token = generateToken(newUser);
+
+    return res.status(201).json({
+      status: true,
+      data: {
+        user: _.omit(newUser, 'password'), // newUser.toJSON()
+        token,
+      },
+      message: 'created successfully',
+    });
+  } catch (error: any) {
+    return next(error);
+  }
+};
+
+export const createOrUpdate = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { name, avatar, email } = req.user;
+  try {
+    const user = await User.findOneAndUpdate(
+      { email },
+      { name, avatar },
+      { new: true }
+    );
 
     if (user) {
       console.log('USER UPDATED', user);
@@ -47,12 +66,16 @@ export const createOrUpdate = async (req: Request, res: Response): Promise<void>
       console.log('USER CREATED', newUser);
       res.json(newUser);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
   }
 };
 
-export const updateMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const updateMe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
   // Check that password is not being updated here
   if (req.body.password || req.body.confirmPassword) {
     return next(new AppError('You cannot update passwords', 400));
@@ -71,42 +94,51 @@ export const updateMe = catchAsync(async (req: Request, res: Response, next: Nex
     runValidators: true,
   });
 
-  return res.json({ status: true, data: updatedUser, message: 'Updated successfully' });
-});
+  return res.json({
+    status: true,
+    data: updatedUser,
+    message: 'Updated successfully',
+  });
+};
 
-export const deleteMe = catchAsync(async (req: IAuthRequest, res: Response) => {
+export const deleteMe = async (
+  req: IAuthRequest,
+  res: Response
+): Promise<void | Response> => {
   await User.findByIdAndUpdate(req.user._id, { isActive: false });
 
   res.status(204).json({ status: true, data: null });
-});
+};
 
-export const changePassword = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // Check if user exists - Find the user by id
-    const existingUser = await User.findById(req.user.id).select('+password');
-    if (!existingUser) return next(new AppError('user invalid', 400));
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  // Check if user exists - Find the user by id
+  const existingUser = await User.findById(req.user.id).select('+password');
+  if (!existingUser) return next(new AppError('user invalid', 400));
 
-    // Verify current password
-    if (!(await existingUser.comparePassword(req.body.currentPassword))) {
-      return next(new AppError('Your current password is wrong', 401));
-    }
-
-    // set new password
-    existingUser.password = req.body.password;
-    existingUser.confirmPassword = req.body.confirmPassword;
-    await existingUser.save();
-    // User.findByIdAndUpdate will not work as intended if used here
-
-    // Generate token and respond to API request
-    return createAndSendTokenWithCookie(
-      existingUser,
-      200,
-      req,
-      res,
-      'Password changed successfully'
-    );
+  // Verify current password
+  if (!(await existingUser.comparePassword(req.body.currentPassword))) {
+    return next(new AppError('Your current password is wrong', 401));
   }
-);
+
+  // set new password
+  existingUser.password = req.body.password;
+  existingUser.confirmPassword = req.body.confirmPassword;
+  await existingUser.save();
+  // User.findByIdAndUpdate will not work as intended if used here
+
+  // Generate token and respond to API request
+  return createAndSendTokenWithCookie(
+    existingUser,
+    200,
+    req,
+    res,
+    'Password changed successfully'
+  );
+};
 
 // USING HANDLER FACTORY
 export const getAllUsers = factory.getAll(User);
@@ -114,7 +146,10 @@ export const getUser = factory.getOne(User);
 export const updateUser = factory.updateOne(User);
 export const deleteUser = factory.deleteOne(User);
 
-export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+export const getCurrentUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   User.findOne({ email: req.user.email }).exec((error, existingUser) => {
     console.log(error, existingUser);
     if (error || !existingUser) throw new Error(error?.message);
@@ -123,13 +158,22 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
   });
 };
 
-export const saveUserAddress = async (req: Request, res: Response): Promise<void> => {
-  await User.findOneAndUpdate({ email: req.user.email }, { address: req.body.address }).exec();
+export const saveUserAddress = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { address: req.body.address }
+  ).exec();
 
   res.json({ ok: true });
 };
 
-export const addToWishlist = async (req: Request, res: Response): Promise<void> => {
+export const addToWishlist = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { productId } = req.body;
 
   await User.findOneAndUpdate(
@@ -149,14 +193,23 @@ export const wishlist = async (req: Request, res: Response): Promise<void> => {
   res.json(userWishList);
 };
 
-export const removeFromWishlist = async (req: Request, res: Response): Promise<any> => {
+export const removeFromWishlist = async (
+  req: Request,
+  res: Response
+): Promise<void | Response> => {
   const { productId } = req.params;
-  await User.findOneAndUpdate({ email: req.user.email }, { $pull: { wishlist: productId } }).exec();
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { $pull: { wishlist: productId } }
+  ).exec();
 
   res.json({ ok: true });
 };
 
-export const getAllOrders = async (_req: Request, res: Response): Promise<void> => {
+export const getAllOrders = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
   const allOrders: OrderDocument[] = await Order.find({})
     .sort('-createdAt')
     .populate('products.product')
@@ -165,7 +218,10 @@ export const getAllOrders = async (_req: Request, res: Response): Promise<void> 
   res.json(allOrders);
 };
 
-export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+export const updateOrderStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { orderId, orderStatus } = req.body;
 
   const updated: OrderDocument | null = await Order.findByIdAndUpdate(
@@ -178,7 +234,7 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
 };
 
 // MIDDLEWARES
-export const getMe = catchAsync(async (req: IAuthRequest, next: NextFunction) => {
+export const getMe = async (req: Request, next: NextFunction): Promise<any> => {
   req.params.id = req.user.id;
   next();
-});
+};

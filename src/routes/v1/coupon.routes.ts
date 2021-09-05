@@ -7,10 +7,8 @@ import { create, remove, list } from '@src/controllers/coupon.controllers';
 
 const router = express.Router();
 
-router.use(authenticate, authorize('admin'));
+router.route('/').post(authenticate, create).get(list);
 
-router.route('/coupons').post(create).get(list);
-
-router.delete('/coupons/:couponId', remove);
+router.delete('/:couponId', authenticate, authorize('admin'), remove);
 
 export default router;
