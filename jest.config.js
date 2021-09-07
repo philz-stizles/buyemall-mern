@@ -5,7 +5,13 @@ module.exports = {
   setupFilesAfterEnv: ['./src/test/setupFilesAfterEnv.ts'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: ['src/**/*.{js,ts}'],
-  coveragePathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
+  coveragePathIgnorePatterns: [
+    '<rootDir>/build/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/src/@types/',
+    '<rootDir>/src/docs/',
+    '<rootDir>/src/graphql/',
+  ],
   coverageThreshold: {
     global: {
       branches: 0,

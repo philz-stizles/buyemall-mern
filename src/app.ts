@@ -9,8 +9,11 @@ import hpp from 'hpp';
 import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-// import errorControllers from './controllers/errorController';
-// import { webhookCheckout } from './controllers/bookingControllers';
+import swaggerUI from 'swagger-ui-express';
+import swaggerDocument from './docs';
+// Middlewares.
+import globalErrorHandler from '@src/middlewares/error.middleware';
+import notFoundHandler from '@src/middlewares/notfound.middleware';
 // Routes
 import authRoutes from '@src/routes/v1/auth.routes';
 import customerRoutes from '@src/routes/v1/user.routes';
@@ -154,5 +157,14 @@ app.use('/api/v1/audit', auditRoutes);
 app.use('/api/v1/logs', logRoutes);
 app.use('/api/v1/maker-checker', makerCheckerRoutes);
 app.use('/api/v1/files', fileRoutes);
+
+// API documentation.
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
+// Handle unhandled routes - routes that are not caught by any routers
+app.all('/^(?!graphql$)/', notFoundHandler);
+
+// Global error handling.
+app.use(globalErrorHandler);
 
 export default app;

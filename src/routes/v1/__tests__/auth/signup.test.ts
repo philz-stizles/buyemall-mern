@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../app';
+import app from '@src/app';
 
 describe('Signup route', () => {
   it('returns a 201 status code on successful signup', async () => {

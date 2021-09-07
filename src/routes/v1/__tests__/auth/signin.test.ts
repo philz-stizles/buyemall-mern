@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../app';
+import app from '@src/app';
 
 describe('Signin route', () => {
   it('returns a 200 status code on successful signin', async () => {

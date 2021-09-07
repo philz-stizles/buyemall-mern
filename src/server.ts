@@ -9,37 +9,12 @@
 // 8. "type" imports (only available in Flow and TypeScript)
 import { Express } from 'express';
 import http from 'http';
-import swaggerUI from 'swagger-ui-express';
 import '../dotenv-config';
-import AppError from './errors/app.error';
 import app from './app';
 import connectDB from './db/index';
 import config from './config';
-// Documentation dependencies
-// import specs from './documentation/swagger.jsdoc';
-import swaggerDocument from './docs';
 import initSocketIO from './socket';
 import initGraphQL from './graphql';
-
-// eslint-disable-next-line no-underscore-dangle
-global.__basedir = `${__dirname}/..`;
-
-// DOCUMENTATION
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-
-// Handle unhandled routes - routes that are not caught by our routers
-// Pass Error to the global error handler middleware
-app.all('*', (req, res, next) => {
-  const error = new AppError(
-    `Can't find ${req.originalUrl} on this server`,
-    404
-  );
-
-  next(error);
-});
-
-// Global error handling
-// app.use(errorControllers.handleGlobalErrors);
 
 const startUp = async (expressApp: Express) => {
   if (!process.env.JWT_AUTH_SECRET) {
