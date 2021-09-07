@@ -19,9 +19,12 @@ const options = {
       },
     },
     servers: [
-      { url: 'http://localhost:5000', description: 'Development server' },
-      { url: 'http://localhost:5000', description: 'Test server' },
-      { url: 'http://localhost:5000', description: 'Production server' },
+      {
+        url: 'http://localhost:5000/api/v1',
+        description: 'Development server',
+      },
+      { url: 'http://localhost:5000/api/v1', description: 'Test server' },
+      { url: 'http://localhost:5000/api/v1', description: 'Production server' },
     ],
   },
   apis: ['./src/routes/v1/*.ts'], // files containing annotations as above

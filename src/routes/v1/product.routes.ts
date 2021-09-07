@@ -12,12 +12,18 @@ import {
   uploadFile,
   removeFile,
   searchFilters,
+  createWithCsv,
+  listWithCsv,
 } from '@src/controllers/product.controllers';
 import { authenticate, authorize } from '@src/middlewares/auth.middlewares';
 
 const router = express.Router();
 
 router.route('/').post(authenticate, authorize('admin'), create).get(listAll);
+router
+  .route('/csv')
+  .post(authenticate, authorize('admin'), createWithCsv)
+  .get(listWithCsv);
 
 router.post('/filtered', list);
 

@@ -1,14 +1,14 @@
-const basicInfo = {
+export default {
   openapi: '3.0.3', // present supported openapi version
   info: {
-    title: 'Ecommerce API',
+    title: 'Buyemall API',
     version: '1.0.0',
     description: 'An ecommerce API',
     termsOfService: 'http://example.com/terms/',
     contact: {
-      name: 'API Support',
-      url: 'http://www.example.com/support',
-      email: 'support@devdezyn.io',
+      name: 'philz.stizles',
+      url: 'https://devdezyn.com/support',
+      email: 'support@devdezyn.com',
     },
     license: {
       name: 'Apache 2.0',
@@ -16,5 +16,3 @@ const basicInfo = {
     },
   },
 };
-
-export default basicInfo;

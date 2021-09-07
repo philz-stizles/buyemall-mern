@@ -45,8 +45,8 @@ const userSchema = new Schema(
     username: {
       type: String,
       trim: true,
-      unique: true,
-      index: true,
+      // `email` must be unique, unless it isn't defined
+      index: { unique: true, sparse: true },
     },
     name: {
       type: String,

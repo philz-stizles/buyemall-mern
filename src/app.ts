@@ -13,14 +13,16 @@ import cookieParser from 'cookie-parser';
 // import { webhookCheckout } from './controllers/bookingControllers';
 // Routes
 import authRoutes from '@src/routes/v1/auth.routes';
-import userRoutes from '@src/routes/v1/user.routes';
-import businessRoutes from '@src/routes/v1/business.routes';
-import subCategoryRoutes from '@src/routes/v1/subCategory.routes';
+import customerRoutes from '@src/routes/v1/user.routes';
+import vendorRoutes from '@src/routes/v1/vendor.routes';
+import subCategoryRoutes from '@src/routes/v1/sub-category.routes';
 import categoryRoutes from '@src/routes/v1/category.routes';
 import productRoutes from '@src/routes/v1/product.routes';
 import cartRoutes from '@src/routes/v1/cart.routes';
 import orderRoutes from '@src/routes/v1/order.routes';
 import couponRoutes from '@src/routes/v1/coupon.routes';
+import makerCheckerRoutes from '@src/routes/v1/maker-checker.routes';
+import transactionRoutes from '@src/routes/v1/transaction.routes';
 import auditRoutes from '@src/routes/v1/audit.routes';
 import logRoutes from '@src/routes/v1/log.routes';
 import fileRoutes from '@src/routes/v1/file.routes';
@@ -139,16 +141,18 @@ app.use((req: Request, res: Response, next) => {
 
 // RESOURCES ROUTES
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/businesses', businessRoutes);
+app.use('/api/v1/customers', customerRoutes);
+app.use('/api/v1/vendors', vendorRoutes);
 app.use('/api/v1/sub-categories', subCategoryRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/carts', cartRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/coupons', couponRoutes);
+app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/audit', auditRoutes);
-app.use('/api/v1/log', logRoutes);
+app.use('/api/v1/logs', logRoutes);
+app.use('/api/v1/maker-checker', makerCheckerRoutes);
 app.use('/api/v1/files', fileRoutes);
 
 export default app;

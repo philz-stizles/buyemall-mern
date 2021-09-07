@@ -13,6 +13,7 @@ interface IUserRating {
 }
 
 export interface IProductDocument {
+  // _id: Types.ObjectId;
   title: string;
   slug: string;
   description: string;

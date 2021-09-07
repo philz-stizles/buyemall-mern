@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import { Model } from 'mongoose';
-import AppError from '../errors/app.error';
-import { APIFeatures } from '../utils/api.utils';
+import AppError from '@src/errors/app.error';
+import { APIFeatures } from '@src/utils/api.utils';
 
 export const createOne =
   (

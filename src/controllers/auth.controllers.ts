@@ -13,7 +13,7 @@ import * as awsService from '@src/services/aws/ses.services';
 // Request body types
 type SignupBody = {
   fullname: string;
-  name: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -31,7 +31,7 @@ type ForgotPasswordBody = { email: string };
 type ResetPasswordParams = { token: string };
 
 const signup = async (req: Request, res: Response) => {
-  const { fullname, name, email, password, confirmPassword } =
+  const { fullname, username, email, password, confirmPassword } =
     req.body as SignupBody;
 
   // Check if user exists
@@ -46,7 +46,7 @@ const signup = async (req: Request, res: Response) => {
 
   const newUser = await User.create({
     fullname,
-    name,
+    username,
     email,
     password,
     confirmPassword,
@@ -109,7 +109,7 @@ export const signupWithEmailVerification = async (
     });
 };
 
-export const signupWithEmailActivation = (req: Request, res: Response) => {
+export const activateAccount = (req: Request, res: Response) => {
   const { token } = req.body;
 
   // Check that activation token has not expred

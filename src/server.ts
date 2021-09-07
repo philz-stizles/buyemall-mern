@@ -21,6 +21,9 @@ import swaggerDocument from './docs';
 import initSocketIO from './socket';
 import initGraphQL from './graphql';
 
+// eslint-disable-next-line no-underscore-dangle
+global.__basedir = `${__dirname}/..`;
+
 // DOCUMENTATION
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 

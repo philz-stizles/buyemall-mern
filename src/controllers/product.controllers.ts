@@ -1,7 +1,10 @@
-import slugify from 'slugify';
+import fs from 'fs';
 import { Request, Response } from 'express';
+import csv from 'fast-csv';
+import { Parser } from 'json2csv';
+import slugify from 'slugify';
 // Models
-import Product from '@src/models/product.model';
+import Product, { IProductDocument } from '@src/models/product.model';
 import User from '@src/models/user.model';
 // Services
 import * as cloudinaryService from '@src/services/cloudinary/cloudinary.services';
@@ -17,6 +20,52 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     // res.status(400).send("Create product failed");
     res.status(400).json({
       err: err.message,
+    });
+  }
+};
+
+export const createWithCsv = async (
+  req: Request,
+  res: Response
+  // eslint-disable-next-line consistent-return
+): Promise<void | Response | any> => {
+  try {
+    if (req.file === undefined) {
+      return res.status(400).send('Please upload a CSV file!');
+    }
+
+    const products: IProductDocument[] = [];
+    // eslint-disable-next-line no-underscore-dangle
+    const path = `${global.__basedir}/resources/static/assets/uploads/${req.file.filename}`;
+
+    fs.createReadStream(path)
+      .pipe(csv.parse({ headers: true }))
+      .on('error', error => {
+        throw error.message;
+      })
+      .on('data', row => {
+        products.push(row);
+      })
+      .on('end', () => {
+        Product.bulkWrite(products)
+          .then(() => {
+            res.status(200).send({
+              message: `Uploaded the file successfully: ${req.file?.originalname}`,
+            });
+          })
+          .catch(error => {
+            res.status(500).send({
+              message: 'Fail to import data into database!',
+              error: error.message,
+            });
+          });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: `Could not upload the file ${
+        req.file ? `: ${req.file.originalname}` : ''
+      }`,
     });
   }
 };
@@ -62,6 +111,53 @@ export const listAll = async (req: Request, res: Response): Promise<void> => {
     .sort([['createdAt', 'desc']])
     .lean();
   res.json(products);
+};
+
+export const listWithCsv = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    // const limit =
+    //   req.query && typeof req.query.limit === 'string'
+    //     ? parseInt(req.query.limit, 10)
+    //     : 10;
+    // const offset =
+    //   req.query && typeof req.query.offset === 'string'
+    //     ? parseInt(req.query.offset, 10)
+    //     : 1;
+
+    const products = await Product.find({}); // .skip(offset).limit(limit);
+    const productObjects: any[] = [];
+
+    products.forEach(obj => {
+      const { _id, title, description, price } = obj;
+      productObjects.push({ _id, title, description, price });
+    });
+
+    const csvFields = ['Id', 'Title', 'Description', 'Price'];
+    const csvParser = new Parser({ fields: csvFields });
+    console.log(productObjects);
+    const csvData = csvParser.parse(productObjects);
+
+    // const path = `./public/csv/file${Date.now()}.csv`;
+    // fs.writeFile(path, csvData, (err: any) => {
+    //   if (err) {
+    //     throw err;
+    //   } else {
+    //     res.download(path); // This is what you need
+    //   }
+    // });
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=Products.csv');
+
+    res.status(200).end(csvData);
+  } catch (error) {
+    console.log('Error', error.message);
+    res.status(500).send({
+      data: null,
+    });
+  }
 };
 
 export const remove = async (

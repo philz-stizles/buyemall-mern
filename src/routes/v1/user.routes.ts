@@ -8,7 +8,6 @@ import {
   wishlist,
   getAllOrders,
   updateOrderStatus,
-  getMe,
   updateMe,
   deleteMe,
   getAllUsers,
@@ -16,7 +15,7 @@ import {
   deleteUser,
   getUser,
   createUser,
-} from '@src/controllers/user.controllers';
+} from '@src/controllers/customer.controllers';
 import { authenticate, authorize } from '@src/middlewares/auth.middlewares';
 import { changePassword } from '@src/controllers/auth.controllers';
 import {
