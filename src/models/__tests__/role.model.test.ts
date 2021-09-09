@@ -35,7 +35,7 @@ describe('Role Model', () => {
       expect(createdMockRole.isActive).toEqual(newMockRole.isActive);
       expect(createdMockRole.createdAt).toBeDefined();
       expect(createdMockRole.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -49,7 +49,7 @@ describe('Role Model', () => {
         isActive: true,
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.name.kind).toEqual('required');
     }
   });
@@ -70,7 +70,7 @@ describe('Role Model', () => {
 
       // Save duplicate mock Role
       await new Role(newMockRole).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.code).toEqual(11000);
     }
   });
@@ -84,7 +84,7 @@ describe('Role Model', () => {
         isActive: true,
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.description.kind).toEqual('required');
     }
   });
@@ -97,7 +97,7 @@ describe('Role Model', () => {
         permissions: [],
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.isActive.kind).toEqual('required');
     }
   });

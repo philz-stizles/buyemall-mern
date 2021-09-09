@@ -3,6 +3,7 @@
 ## Introduction
 
 This is an e-commerce back end resource that enables users to signup and purchase items
+"mongoose": "^5.13.0",
 
 ## Technologies
 

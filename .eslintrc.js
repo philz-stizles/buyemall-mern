@@ -26,6 +26,10 @@ module.exports = {
       'error',
       { argsIgnorePattern: 'req|res|next|val' },
     ],
+    '@typescript-eslint/no-explicit-any': [
+      'error',
+      { argsIgnorePattern: 'error|err|e|' },
+    ],
     'import/extensions': 'off',
     'import/no-unresolved': 'error',
     // note you must disable the base rule as it can report incorrect errors

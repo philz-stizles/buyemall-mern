@@ -143,20 +143,22 @@ app.use((req: Request, res: Response, next) => {
 });
 
 // RESOURCES ROUTES
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/customers', customerRoutes);
-app.use('/api/v1/vendors', vendorRoutes);
-app.use('/api/v1/sub-categories', subCategoryRoutes);
-app.use('/api/v1/categories', categoryRoutes);
-app.use('/api/v1/products', productRoutes);
-app.use('/api/v1/carts', cartRoutes);
-app.use('/api/v1/orders', orderRoutes);
-app.use('/api/v1/coupons', couponRoutes);
-app.use('/api/v1/transactions', transactionRoutes);
-app.use('/api/v1/audit', auditRoutes);
-app.use('/api/v1/logs', logRoutes);
-app.use('/api/v1/maker-checker', makerCheckerRoutes);
-app.use('/api/v1/files', fileRoutes);
+const api = process.env.API_URL;
+
+app.use(`${api}/auth`, authRoutes);
+app.use(`${api}/customers`, customerRoutes);
+app.use(`${api}/vendors`, vendorRoutes);
+app.use(`${api}/sub-categories`, subCategoryRoutes);
+app.use(`${api}/categories`, categoryRoutes);
+app.use(`${api}/products`, productRoutes);
+app.use(`${api}/carts`, cartRoutes);
+app.use(`${api}/orders`, orderRoutes);
+app.use(`${api}/coupons`, couponRoutes);
+app.use(`${api}/transactions`, transactionRoutes);
+app.use(`${api}/audit`, auditRoutes);
+app.use(`${api}/logs`, logRoutes);
+app.use(`${api}/maker-checker`, makerCheckerRoutes);
+app.use(`${api}/files`, fileRoutes);
 
 // API documentation.
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));

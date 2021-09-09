@@ -30,7 +30,7 @@ describe('Customer Model', () => {
       expect(createdMockCustomer.wishlist).toBeDefined();
       expect(createdMockCustomer.createdAt).toBeDefined();
       expect(createdMockCustomer.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -40,7 +40,7 @@ describe('Customer Model', () => {
       await new Customer({
         phone: '234111111111',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.account.kind).toEqual('required');
     }
   });

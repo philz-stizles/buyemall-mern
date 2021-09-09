@@ -28,7 +28,7 @@ describe('Permission Model', () => {
         newMockPermission.description
       );
       expect(createdMockPermission.createdAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -39,7 +39,7 @@ describe('Permission Model', () => {
         name: '',
         description: 'User can create categories',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.name.kind).toEqual('required');
     }
   });
@@ -57,7 +57,7 @@ describe('Permission Model', () => {
 
       // Save duplicate mock Permission
       await new Permission(newMockPermission).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.code).toEqual(11000);
     }
   });
@@ -68,7 +68,7 @@ describe('Permission Model', () => {
         name: 'category:update',
         description: '',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.description.kind).toEqual('required');
     }
   });

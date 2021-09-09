@@ -7,9 +7,7 @@ import {
 } from 'mongoose';
 import BadRequestError from '@src/errors/bad-request';
 import NotFoundError from '@src/errors/not-found';
-import Category, {
-  ICategoryDocument,
-} from '@src/models/mongoose/category.model';
+import Category, { ICategoryDocument } from '@src/models/category.model';
 
 exports.create = async (
   modelObject: DocumentDefinition<ICategoryDocument>

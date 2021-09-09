@@ -7,7 +7,7 @@ import {
 } from 'mongoose';
 import BadRequestError from '@src/errors/bad-request';
 import NotFoundError from '@src/errors/not-found';
-import Coupon, { ICouponDocument } from '@src/models/mongoose/coupon.model';
+import Coupon, { ICouponDocument } from '@src/models/coupon.model';
 
 exports.create = async (modelObject: DocumentDefinition<ICouponDocument>) => {
   const existingCoupon = await Coupon.findOne({ name: modelObject.name });

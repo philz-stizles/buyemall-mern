@@ -152,7 +152,7 @@ export const listWithCsv = async (
     res.setHeader('Content-Disposition', 'attachment; filename=Products.csv');
 
     res.status(200).end(csvData);
-  } catch (error) {
+  } catch (error: any | unknown) {
     console.log('Error', error.message);
     res.status(500).send({
       data: null,
@@ -413,7 +413,7 @@ const handleSub = async (req: Request, res: Response, sub: string) => {
 const handleShipping = async (
   req: Request,
   res: Response,
-  shipping: string
+  shipping: boolean
 ) => {
   const products = await Product.find({ shipping })
     .populate('category', '_id name')

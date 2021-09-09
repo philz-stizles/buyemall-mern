@@ -34,7 +34,7 @@ describe('Review Model', () => {
       );
       expect(createdMockReview.createdAt).toBeDefined();
       expect(createdMockReview.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -47,7 +47,7 @@ describe('Review Model', () => {
         product: new mongoose.Types.ObjectId(),
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.review.kind).toEqual('required');
     }
   });
@@ -59,7 +59,7 @@ describe('Review Model', () => {
         product: new mongoose.Types.ObjectId(),
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.rating.kind).toEqual('required');
     }
   });
@@ -71,7 +71,7 @@ describe('Review Model', () => {
         rating: 4,
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.product.kind).toEqual('required');
     }
   });
@@ -83,7 +83,7 @@ describe('Review Model', () => {
         rating: 4,
         product: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.createdBy.kind).toEqual('required');
     }
   });

@@ -37,7 +37,7 @@ describe('User Model', () => {
       expect(createdMockUser.password).toBeDefined();
       expect(createdMockUser.createdAt).toBeDefined();
       expect(createdMockUser.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -49,7 +49,7 @@ describe('User Model', () => {
         email: 'testuser@mail.com',
         password: 'password',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.fullname.kind).toEqual('required');
     }
   });
@@ -61,7 +61,7 @@ describe('User Model', () => {
         email: '',
         password: 'password',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.email.kind).toEqual('required');
     }
   });
@@ -80,7 +80,7 @@ describe('User Model', () => {
 
       // Save duplicate mock User
       await new User(newMockUser).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.code).toEqual(11000);
     }
   });
@@ -92,7 +92,7 @@ describe('User Model', () => {
         email: 'testuser@mail.com',
         password: '',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.password.kind).toEqual('required');
     }
   });

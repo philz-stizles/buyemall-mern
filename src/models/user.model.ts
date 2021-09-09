@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Schema, model, Types, Document, PopulatedDoc } from 'mongoose';
+import { Schema, model, Types, Document, PopulatedDoc, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -10,7 +10,7 @@ interface IUserToken {
 }
 
 // Create an interface representing a document in MongoDB.
-export interface IUserDocument extends Document {
+export interface IUser {
   fullname: string;
   username: string;
   name: string;
@@ -23,19 +23,30 @@ export interface IUserDocument extends Document {
   passwordResetToken: string | undefined;
   roles: PopulatedDoc<IRoleDocument & Document>[];
   // eslint-disable-next-line no-unused-vars
-  comparePassword: (candidatePassword: string) => Promise<boolean>;
-  createPasswordResetToken: () => string;
-  // eslint-disable-next-line no-unused-vars
-  isPasswordChangedAfterTokenGen: (issuedAt: number) => boolean;
+  // comparePassword: (candidatePassword: string) => Promise<boolean>;
+  // createPasswordResetToken: () => string;
+  // // eslint-disable-next-line no-unused-vars
+  // isPasswordChangedAfterTokenGen: (issuedAt: number) => boolean;
   isActive: boolean;
   tokens: IUserToken[];
   createdAt: string;
   updatedAt: string;
 }
 
+export interface IUserDocument extends IUser, Document {
+  comparePassword: (candidatePassword: string) => Promise<boolean>;
+  createPasswordResetToken: () => string;
+  // eslint-disable-next-line no-unused-vars
+  isPasswordChangedAfterTokenGen: (issuedAt: number) => boolean;
+}
+
+export interface IUserModel extends Model<IUserDocument> {
+  findByAuthentication(email: string, password: string): Promise<void | any>;
+}
+
 // Put as much business logic in the models to keep the controllers as simple and lean as possible
 // 2. Create a Schema corresponding to the document interface.
-const userSchema = new Schema(
+const schema = new Schema<IUserDocument, IUserModel>(
   {
     fullname: {
       type: String,
@@ -84,7 +95,7 @@ const userSchema = new Schema(
 );
 
 // Create schema methods
-userSchema.pre('save', async function (next: any) {
+schema.pre('save', async function (next: any) {
   const user = this as IUserDocument;
   // If password was not modified, do not encrypt
   if (!user.isModified('password')) return next();
@@ -105,7 +116,7 @@ userSchema.pre('save', async function (next: any) {
   }
 });
 
-userSchema.pre('save', async function (next) {
+schema.pre('save', async function (next) {
   const user = this as IUserDocument;
   // If password was not modified, do not encrypt
   if (!user.isModified('password') || user.isNew) return next(); // When you change password or create a new user,
@@ -116,7 +127,7 @@ userSchema.pre('save', async function (next) {
   return next();
 });
 
-// userSchema.pre(/^find/, async next => {
+// schema.pre(/^find/, async next => {
 //   const user = this as IUserDocument;
 
 //   // this points to the current query
@@ -124,7 +135,7 @@ userSchema.pre('save', async function (next) {
 //   next();
 // });
 
-userSchema.methods.comparePassword = async function (password: string) {
+schema.methods.comparePassword = async function (password: string) {
   // This is essentially the same as `return await bcrypt.compare();`,
   // but the rule checks only`await` in `return` statements
   const user = this as IUserDocument;
@@ -133,12 +144,12 @@ userSchema.methods.comparePassword = async function (password: string) {
     return isMatch;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.log(error.message);
+    console.log(error);
     return false;
   }
 };
 
-userSchema.methods.isPasswordChangedAfterTokenGen = function (
+schema.methods.isPasswordChangedAfterTokenGen = function (
   jwtTimestamp
 ): boolean {
   const user = this as IUserDocument;
@@ -152,7 +163,7 @@ userSchema.methods.isPasswordChangedAfterTokenGen = function (
   return passwordChangedAtInSeconds > jwtTimestamp;
 };
 
-userSchema.methods.createPasswordResetToken = function (): string {
+schema.methods.createPasswordResetToken = function (): string {
   const user = this as IUserDocument;
   const resetToken = crypto.randomBytes(32).toString('hex');
   user.passwordResetToken = crypto
@@ -165,7 +176,7 @@ userSchema.methods.createPasswordResetToken = function (): string {
   return resetToken;
 };
 
-// userSchema.pre('save', async function (next) {
+// schema.pre('save', async function (next) {
 //   // Do not use arrow functions here
 //   const user = this as IUserDocument;
 //   // Check if password is defined and modified
@@ -179,10 +190,10 @@ userSchema.methods.createPasswordResetToken = function (): string {
 //   next();
 // });
 
-userSchema.statics.findByAuthentication = async (
+schema.statics.findByAuthentication = async (
   email: string,
   password: string
-) => {
+): Promise<void | any> => {
   // You can use arrow functions here as we will not be requiring
   // the 'this' reference
   // eslint-disable-next-line no-use-before-define
@@ -200,7 +211,7 @@ userSchema.statics.findByAuthentication = async (
   return user;
 };
 
-userSchema.methods.generateAuthToken = async function () {
+schema.methods.generateAuthToken = async function () {
   const user = this as IUserDocument;
   const token = jwt.sign(
     { _id: user._id.toString() },
@@ -221,7 +232,7 @@ userSchema.methods.generateAuthToken = async function () {
 };
 
 // Utility method to return users public profile
-userSchema.methods.getPublicProfile = function () {
+schema.methods.getPublicProfile = function () {
   const user = this as IUserDocument;
   const userObject = user.toObject();
 
@@ -230,7 +241,7 @@ userSchema.methods.getPublicProfile = function () {
   return userObject;
 };
 
-// userSchema.methods.toJSON = function () {
+// schema.methods.toJSON = function () {
 //   const user = this as IUserDocument;
 
 //   // Create a JSON representation of the user
@@ -246,5 +257,5 @@ userSchema.methods.getPublicProfile = function () {
 // };
 
 // Create a Model.
-const User = model<IUserDocument>('User', userSchema);
+const User = model<IUserDocument, IUserModel>('User', schema);
 export default User;

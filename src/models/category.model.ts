@@ -1,7 +1,7 @@
 import { Schema, model, Types, Document, PopulatedDoc } from 'mongoose';
 import { IUserDocument } from '@src/models/user.model';
 
-export interface ICategoryDocument {
+export interface ICategoryDocument extends Document {
   name: string;
   slug: string;
   createdBy: PopulatedDoc<IUserDocument & Document>;
@@ -9,7 +9,7 @@ export interface ICategoryDocument {
   updatedAt: Date;
 }
 
-const schema = new Schema<ICategoryDocument>(
+const schema = new Schema(
   {
     name: {
       type: String,
@@ -30,6 +30,4 @@ const schema = new Schema<ICategoryDocument>(
   { timestamps: true }
 );
 
-const Category = model<ICategoryDocument>('Category', schema);
-
-export default Category;
+export default model<ICategoryDocument>('Category', schema);

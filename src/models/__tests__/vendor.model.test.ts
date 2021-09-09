@@ -26,7 +26,7 @@ describe('Vendor Model', () => {
       expect(createdMockVendor.bio).toEqual(newMockVendor.bio);
       expect(createdMockVendor.createdAt).toBeDefined();
       expect(createdMockVendor.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -38,7 +38,7 @@ describe('Vendor Model', () => {
         logo: Buffer.from([0b11110000, 0b10011111]),
         bio: 'A gadget selling company',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.name.kind).toEqual('required');
     }
   });
@@ -49,7 +49,7 @@ describe('Vendor Model', () => {
         name: 'Collectables co.',
         bio: 'A gadget selling company',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.logo.kind).toEqual('required');
     }
   });
@@ -61,7 +61,7 @@ describe('Vendor Model', () => {
         logo: Buffer.from([0b11110000, 0b10011111]),
         bio: '',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.bio.kind).toEqual('required');
     }
   });

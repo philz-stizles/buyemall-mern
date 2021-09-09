@@ -1,17 +1,43 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-import { MutationResponse } from '../interfaces';
+import { ILoginResponse, ISignupResponse } from '../interfaces';
 
-export default {
-  signup: async (_parent: any, args: any, context: any): Promise<MutationResponse> => {
-    const { name, email, password } = args.credentials;
-    const { users } = context.dataSources;
-    console.log(users);
-    return { code: name, message: email, success: true };
+export const authMutations = {
+  signup: async (
+    _parent: any,
+    args: any,
+    context: any
+  ): Promise<ISignupResponse> => {
+    const { fullname, username, email, password } = args.credentials;
+    const createdUser = await context.dataSources.users.create({
+      fullname,
+      username,
+      email,
+      password,
+    });
+    console.log(createdUser);
+    return {
+      code: '201',
+      message: 'Signup successful',
+      success: true,
+      data: createdUser,
+    };
   },
-  login: async (_parent: any, args: any, context: any): Promise<MutationResponse> => {
-    return { code: '', message: '', success: true };
+  login: async (
+    _parent: any,
+    args: any,
+    context: any
+  ): Promise<ILoginResponse> => {
+    const loggedInUser = await context.dataSources.users.login(
+      args.credentials
+    );
+    return {
+      code: '200',
+      message: 'Login successful',
+      success: true,
+      data: loggedInUser,
+    };
   },
 };
+
+export const authQueries = {};

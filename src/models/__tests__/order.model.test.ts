@@ -29,7 +29,7 @@ describe('Order Model', () => {
       );
       expect(createdMockOrder.createdAt).toBeDefined();
       expect(createdMockOrder.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -41,7 +41,7 @@ describe('Order Model', () => {
         paymentIntent: {},
         status: 'Not Processed',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.createdBy.kind).toEqual('required');
     }
   });

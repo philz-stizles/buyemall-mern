@@ -61,7 +61,7 @@ describe('Cart Model', () => {
       );
       expect(createdMockCart.createdAt).toBeDefined();
       expect(createdMockCart.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -72,7 +72,7 @@ describe('Cart Model', () => {
   //       totalAmount: 23,
   //       createdBy: new mongoose.Types.ObjectId().toHexString(),
   //     }).save();
-  //   } catch (err) {
+  //   } catch (err: any | unknown) {
   //     expect(err.errors.products.kind).toEqual('required');
   //   }
   // });
@@ -87,7 +87,7 @@ describe('Cart Model', () => {
         totalAmount: 0,
         createdBy: new mongoose.Types.ObjectId().toHexString(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.products.kind).toEqual('required');
     }
   });

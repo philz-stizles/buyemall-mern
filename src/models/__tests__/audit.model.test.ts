@@ -42,7 +42,7 @@ describe('Audit Model', () => {
         newMockAudit.createdBy.toHexString()
       );
       expect(createdMockAudit.createdAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -57,7 +57,7 @@ describe('Audit Model', () => {
         payload: '/{/}',
         createdBy: new mongoose.Types.ObjectId().toHexString(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.action.kind).toEqual('required');
     }
   });
@@ -72,7 +72,7 @@ describe('Audit Model', () => {
         payload: '/{/}',
         createdBy: new mongoose.Types.ObjectId().toHexString(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.ip.kind).toEqual('required');
     }
   });
@@ -86,7 +86,7 @@ describe('Audit Model', () => {
         type: 'auth:login',
         payload: '/{/}',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.createdBy.kind).toEqual('required');
     }
   });

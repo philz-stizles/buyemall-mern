@@ -45,7 +45,7 @@ describe('Product Model', () => {
       expect(createdMockProduct.sold).toBeDefined();
       expect(createdMockProduct.createdAt).toBeDefined();
       expect(createdMockProduct.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -58,7 +58,7 @@ describe('Product Model', () => {
         description: 'Some product description',
         price: 23,
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.title.kind).toEqual('required');
     }
   });

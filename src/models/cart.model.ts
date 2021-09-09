@@ -1,5 +1,5 @@
 import { Schema, Types, model, Document, PopulatedDoc } from 'mongoose';
-import { IUserDocument } from '@src/models//user.model';
+import { IUserDocument } from '@src/models/user.model';
 
 export interface ICartProduct {
   product: { _id: Types.ObjectId };
@@ -8,7 +8,7 @@ export interface ICartProduct {
   price: number;
 }
 
-export interface ICartDocument {
+export interface ICartDocument extends Document {
   products: ICartProduct[];
   totalAmount: number;
   totalAfterDiscount: number;
@@ -17,7 +17,7 @@ export interface ICartDocument {
   updatedAt: string;
 }
 
-const schema = new Schema<ICartDocument>(
+const schema = new Schema(
   {
     products: [
       {

@@ -28,7 +28,7 @@ describe('Category Model', () => {
       expect(createdMockCategory.createdBy.toHexString()).toEqual(
         newMockCategory.createdBy.toHexString()
       );
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -40,7 +40,7 @@ describe('Category Model', () => {
         slug: 'women',
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.name.kind).toEqual('required');
     }
   });
@@ -59,7 +59,7 @@ describe('Category Model', () => {
 
       // Save duplicate mock Category
       await new Category(newMockCategory).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.code).toEqual(11000);
     }
   });
@@ -71,7 +71,7 @@ describe('Category Model', () => {
         slug: '',
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.slug.kind).toEqual('required');
     }
   });
@@ -82,7 +82,7 @@ describe('Category Model', () => {
         name: 'Women',
         slug: 'women',
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.createdBy.kind).toEqual('required');
     }
   });

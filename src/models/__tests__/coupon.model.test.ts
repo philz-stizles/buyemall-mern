@@ -32,7 +32,7 @@ describe('Coupon Model', () => {
       );
       expect(createdMockCoupon.createdAt).toBeDefined();
       expect(createdMockCoupon.updatedAt).toBeDefined();
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -45,7 +45,7 @@ describe('Coupon Model', () => {
         discount: 12,
         createBy: new mongoose.Types.ObjectId().toHexString(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.name.kind).toEqual('required');
     }
   });
@@ -57,7 +57,7 @@ describe('Coupon Model', () => {
         discount: 12,
         createBy: new mongoose.Types.ObjectId().toHexString(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.expiry.kind).toEqual('required');
     }
   });
@@ -77,7 +77,7 @@ describe('Coupon Model', () => {
 
       // Save duplicate mock Coupon
       await new Coupon(newMockCoupon).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.code).toEqual(11000);
     }
   });
@@ -89,7 +89,7 @@ describe('Coupon Model', () => {
         expiry: new Date(),
         createBy: new mongoose.Types.ObjectId().toHexString(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.discount.kind).toEqual('required');
     }
   });
@@ -101,7 +101,7 @@ describe('Coupon Model', () => {
         expiry: new Date(),
         discount: 12,
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.createdBy.kind).toEqual('required');
     }
   });

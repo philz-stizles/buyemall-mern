@@ -50,7 +50,7 @@ const signup = async (req: Request, res: Response) => {
     email,
     password,
     confirmPassword,
-    role: ['customer'],
+    roles: ['customer'],
   });
   const token = generateToken({ id: newUser._id });
 

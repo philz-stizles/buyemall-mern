@@ -24,7 +24,7 @@ export const authenticate = catchAsync(
       return next(new AppError('You are not logged in. Please log', 401));
 
     // Check if token is valid
-    const decodedToken: IJWTokenPayload = await verifyToken(token);
+    const decodedToken: IJWTokenPayload | undefined = await verifyToken(token);
     if (!decodedToken)
       return next(new AppError('You are not authorized. Please log', 401));
 
@@ -78,7 +78,7 @@ export const authenticateView = catchAsync(
     if (req.cookies.token) {
       try {
         // Check if token is valid
-        const decodedToken: IJWTokenPayload = await verifyToken(
+        const decodedToken: IJWTokenPayload | undefined = await verifyToken(
           req.cookies.token
         );
         if (!decodedToken) {

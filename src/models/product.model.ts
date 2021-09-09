@@ -1,6 +1,8 @@
-import { Schema, Types, model, Document, PopulatedDoc } from 'mongoose';
+import { Schema, Types, model, Document, PopulatedDoc, Model } from 'mongoose';
+import slugify from 'slugify';
 import { ICategoryDocument } from './category.model';
 import { IUserDocument } from '@src/models/user.model';
+import { ISubCategoryDocument } from './sub-category.model';
 
 interface IFileUpload {
   id: string;
@@ -12,26 +14,30 @@ interface IUserRating {
   postedBy: PopulatedDoc<IUserDocument & Document>;
 }
 
-export interface IProductDocument {
+export interface IProduct {
   // _id: Types.ObjectId;
   title: string;
   slug: string;
   description: string;
   price: number;
   category: PopulatedDoc<ICategoryDocument & Document>;
-  subs: Types.ObjectId;
+  subs: PopulatedDoc<ISubCategoryDocument>;
   quantity: number;
   sold: number;
   images: IFileUpload[];
-  shipping: string;
-  color: string;
+  shipping: boolean;
+  color: string[];
   brand: string;
   ratings: IUserRating[];
   createdAt: string;
   updatedAt: string;
 }
 
-const productSchema = new Schema<IProductDocument>(
+export interface IProductDocument extends IProduct, Document {}
+
+export interface IProductModel extends Model<IProductDocument> {}
+
+const schema = new Schema<IProductDocument, IProductModel>(
   {
     title: {
       type: String,
@@ -64,11 +70,13 @@ const productSchema = new Schema<IProductDocument>(
     quantity: Number,
     sold: { type: Number, default: 0 },
     images: [{ id: String, url: String }],
-    shipping: { type: String, enum: ['Yes', 'No'] },
-    color: {
-      type: String,
-      enum: ['Black', 'Brown', 'Silver', 'White', 'Blue'],
-    },
+    shipping: { type: Boolean, required: true, default: false },
+    color: [
+      {
+        type: String,
+        enum: ['Black', 'Brown', 'Silver', 'White', 'Blue'],
+      },
+    ],
     brand: {
       type: String,
       enum: ['Apple', 'Samsung', 'Microsoft', 'Lenovo', 'ASUS'],
@@ -80,4 +88,14 @@ const productSchema = new Schema<IProductDocument>(
   { timestamps: true }
 );
 
-export default model<IProductDocument>('Product', productSchema);
+schema.pre('validate', async function (next) {
+  const product = this as IProductDocument;
+  if (product.isModified('title') || product.isNew) {
+    product.slug = slugify(product.title);
+  }
+
+  return next();
+});
+
+const Product = model<IProductDocument, IProductModel>('Product', schema);
+export default Product;

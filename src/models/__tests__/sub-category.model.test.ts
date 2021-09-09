@@ -31,7 +31,7 @@ describe('SubCategory Model', () => {
       expect(createdMockSubCategory.createdBy.toHexString()).toEqual(
         newMockSubCategory.createdBy.toHexString()
       );
-    } catch (err) {
+    } catch (err: any | unknown) {
       throw new Error(err);
     }
   });
@@ -44,7 +44,7 @@ describe('SubCategory Model', () => {
         category: new mongoose.Types.ObjectId(),
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.name.kind).toEqual('required');
     }
   });
@@ -64,7 +64,7 @@ describe('SubCategory Model', () => {
 
       // Save duplicate mock SubCategory
       await new SubCategory(newMockSubCategory).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.code).toEqual(11000);
     }
   });
@@ -77,7 +77,7 @@ describe('SubCategory Model', () => {
         category: new mongoose.Types.ObjectId(),
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.slug.kind).toEqual('required');
     }
   });
@@ -89,7 +89,7 @@ describe('SubCategory Model', () => {
         slug: 'shoes',
         createdBy: new mongoose.Types.ObjectId(),
       }).save();
-    } catch (err) {
+    } catch (err: any | unknown) {
       expect(err.errors.category.kind).toEqual('required');
     }
   });

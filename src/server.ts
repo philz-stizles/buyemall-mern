@@ -30,7 +30,6 @@ const startUp = async (expressApp: Express) => {
   }
 
   // Connect to database
-  console.log(config().dbUri);
   await connectDB(config().dbUri);
 
   // initialize http server

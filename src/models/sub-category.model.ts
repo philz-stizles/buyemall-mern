@@ -3,7 +3,7 @@ import { ICategoryDocument } from '@src/models/category.model';
 import { IUserDocument } from '@src/models/user.model';
 
 // Document interface
-export interface ISubCategoryDocument {
+export interface ISubCategoryDocument extends Document {
   name: string;
   slug: string;
   category: PopulatedDoc<ICategoryDocument & Document>;
@@ -12,7 +12,7 @@ export interface ISubCategoryDocument {
   updatedAt: Date;
 }
 
-const schema = new Schema<ISubCategoryDocument>(
+const schema = new Schema(
   {
     name: {
       type: String,
