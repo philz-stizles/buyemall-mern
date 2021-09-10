@@ -3,6 +3,7 @@
 ## Introduction
 
 This is an e-commerce back end resource that enables users to signup and purchase items
+"mongoose": "^5.13.0",
 
 ## Technologies
 
@@ -113,6 +114,10 @@ This is an e-commerce back end resource that enables users to signup and purchas
 - cloudinary:
 - aws sdk
 
+## Bull
+
+## Redis
+
 ## Socket.io
 
 - install packages
@@ -136,7 +141,16 @@ aws-sdk: npm install aws-sdk
 - Heroku deploy
   - Limitations:
     - Database: You may need to use cloud mongo
-- Digital Ocean deploy [https://www.codecontinue.com/article/deploy-react-node-mern-full-stack-app-to-digital-ocean](Deployment Documentation)
+- Digital Ocean deploy
+  (https://www.codecontinue.com/article/deploy-react-node-mern-full-stack-app-to-digital-ocean)[Deployment Documentation]
+
+## Swagger Documentation
+
+- Resources:
+
+  - [API general info](https://swagger.io/docs/specification/api-general-info/)
+
+- http://localhost:<PORT>/api-docs.
 
 ## Security issues and best practices
 
