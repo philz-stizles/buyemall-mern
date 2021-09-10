@@ -1,0 +1,13 @@
+export const SET_AUTH_STATE = 'SET_AUTH_STATE';
+export const LOGOUT = 'LOGOUT';
+
+export const ADD_TO_CART = 'ADD_TO_CART';
+export const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
+
+export const SET_PAYMENT_METHOD = 'SET_PAYMENT_METHOD';
+
+export const DRAWER_TOGGLE = 'DRAWER_TOGGLE';
+
+export const SEARCH_QUERY = 'SEARCH_QUERY';
+
+export const TOGGLE_COUPON_APPLY = 'TOGGLE_COUPON_APPLY';
