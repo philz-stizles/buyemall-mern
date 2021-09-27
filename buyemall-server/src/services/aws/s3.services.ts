@@ -1,11 +1,14 @@
 import fs, { PathLike } from 'fs';
-import AWS, { S3, AWSError } from 'aws-sdk';
+import { S3, AWSError } from 'aws-sdk';
+import AWS from './index';
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
+// const s3 = new AWS.S3({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+
+const s3 = new AWS.S3({ apiVersion: '2010-12-01' });
 
 export const uploadDoc = (
   name: string,

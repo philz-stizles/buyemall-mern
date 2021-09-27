@@ -82,6 +82,12 @@ const initGraphQL = (app: Express, server: Server): void => {
   );
 
   apolloServer.applyMiddleware({ app, path: '/graphql' });
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log(
+      `🚀 GraphQL playground @ http://localhost:${process.env.PORT}/graphql`
+    );
+  }
 };
 
 export default initGraphQL;

@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import shortId from 'shortid';
-import { sendPlainEmail } from '../services/email';
+import { sendPlainEmail } from '../services/email/nodemailer.services';
 import AppError from '../errors/app.error';
 import { generateToken } from '../utils/auth.utils';
 import User, { IUserDocument } from '@src/models/user.model';

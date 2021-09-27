@@ -1,10 +1,11 @@
 {
-  "name": "buyemall-node-api",
+  "name": "buyemall-server",
   "version": "1.0.0",
   "description": "APP",
   "main": "src/server.ts",
   "scripts": {
     "eslint": "eslint --fix",
+    "test:ci": "jest",
     "test": "jest",
     "test:watch": "jest --watchAll --detectOpenHandles",
     "test:coverage": "jest --coverage",

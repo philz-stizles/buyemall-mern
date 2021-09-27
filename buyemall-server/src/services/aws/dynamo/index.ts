@@ -1,4 +1,4 @@
-import AWS from './index';
+import AWS from '../index';
 
 const dynamodb = new AWS.DynamoDB();
 
