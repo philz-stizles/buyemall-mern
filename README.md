@@ -1,5 +1,7 @@
 # BUYEMALL E-COMMERCE API
 
+![example workflow](https://github.com/philz-stizles/buyemall-mern/actions/workflows/test-buyemall-server.yml/badge.svg)
+
 ## Introduction
 
 This is an e-commerce back end resource that enables users to signup and purchase items
@@ -142,7 +144,7 @@ aws-sdk: npm install aws-sdk
   - Limitations:
     - Database: You may need to use cloud mongo
 - Digital Ocean deploy
-  (https://www.codecontinue.com/article/deploy-react-node-mern-full-stack-app-to-digital-ocean)[Deployment Documentation]
+  [https://www.codecontinue.com/article/deploy-react-node-mern-full-stack-app-to-digital-ocean](Deployment Documentation)
 
 ## Swagger Documentation
 

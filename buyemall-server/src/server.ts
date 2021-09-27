@@ -52,6 +52,7 @@ const startUp = async (expressApp: Express) => {
   const PORT: number = parseInt(process.env.PORT as string, 10);
   const server = httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on ${PORT} ${process.env.NODE_ENV}`);
+    console.log(`🚀 API Docs @ http://localhost:${PORT}/api-docs`);
   });
 
   process.on('unhandledRejection', (err?: Error) => {
