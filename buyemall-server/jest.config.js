@@ -5,6 +5,7 @@ module.exports = {
   setupFilesAfterEnv: ['./src/test/setupFilesAfterEnv.ts'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: ['src/**/*.{js,ts}'],
+  coverageReporters: ['json-summary', 'text', 'lcov'],
   coveragePathIgnorePatterns: [
     '<rootDir>/build/',
     '<rootDir>/node_modules/',
