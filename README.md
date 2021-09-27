@@ -1,6 +1,6 @@
 # BUYEMALL E-COMMERCE API
 
-![example workflow](https://github.com/philz-stizles/buyemall-mern/actions/workflows/tests-buyemall-server.yml/badge.svg)
+![example workflow](https://github.com/philz-stizles/buyemall-mern/actions/workflows/tests-buyemall-server.yml/badge.svg) ![example workflow](https://github.com/philz-stizles/buyemall-mern/actions/workflows/tests-buyemall-web.yml/badge.svg)
 
 ## Introduction
 

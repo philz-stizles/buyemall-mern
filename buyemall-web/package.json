@@ -1,5 +1,5 @@
 {
-  "name": "buyemall-client",
+  "name": "buyemall-web",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
